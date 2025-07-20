@@ -2,38 +2,73 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Presensi Guru - SMA Negeri 1 Limboto</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #f4f4f4;
-      padding: 50px;
-    }
-    h1 {
-      color: #002244;
-    }
-    .button {
-      display: inline-block;
-      margin: 20px;
-      padding: 15px 30px;
-      background-color: #007BFF;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-size: 18px;
-    }
-    .button:hover {
-      background-color: #0056b3;
-    }
-  </style>
+  <title>Presensi Guru</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <h1>Presensi Guru</h1>
-  <p>Silakan pilih presensi:</p>
-  <a href="https://example.com/presensi-masuk" class="button">Presensi Masuk</a>
-  <a href="https://example.com/presensi-pulang" class="button">Presensi Pulang</a>
-  <p style="margin-top:50px; font-size:0.9em;">SMA Negeri 1 Limboto</p>
+
+  <form id="presensiForm">
+    <label for="nip">NIP:</label><br />
+    <input type="text" id="nip" name="nip" required /><br /><br />
+
+    <label for="nama">Nama:</label><br />
+    <input type="text" id="nama" name="nama" required /><br /><br />
+
+    <label for="jenis">Jenis:</label><br />
+    <select id="jenis" name="jenis" required>
+      <option value="masuk">Masuk</option>
+      <option value="pulang">Pulang</option>
+    </select><br /><br />
+
+    <button type="submit">Kirim Presensi</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    // Inisialisasi Supabase
+    const SUPABASE_URL = 'https://lfylqrgvcrbnkyvudtgj.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmeWxxcmd2Y3Jibmt5dnVkdGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzM3ODksImV4cCI6MjA2ODU0OTc4OX0.pw9jKov4bpHoiCM31mS8I4PfUAk39mqX2eeF69Gs1ag';
+
+    const supabase = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const form = document.getElementById('presensiForm');
+    const resultDiv = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const nip = form.nip.value.trim();
+      const nama = form.nama.value.trim();
+      const jenis = form.jenis.value;
+
+      // Data device info (opsional)
+      const deviceInfo = navigator.userAgent;
+
+      // Waktu scan otomatis (supabase bisa otomatis insert timestamp, tapi kita bisa kirim juga)
+      const waktuScan = new Date().toISOString();
+
+      // Kirim data ke Supabase
+      const { data, error } = await supabase
+        .from('presensi')
+        .insert([
+          {
+            NIP: nip,
+            Nama: nama,
+            "Waktu Scan": waktuScan,
+            Jenis: jenis,
+            "Device Info": deviceInfo
+          }
+        ]);
+
+      if (error) {
+        resultDiv.innerText = 'Gagal kirim presensi: ' + error.message;
+      } else {
+        resultDiv.innerText = 'Presensi berhasil dikirim. Terima kasih, ' + nama + '!';
+        form.reset();
+      }
+    });
+  </script>
 </body>
 </html>
