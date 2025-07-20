@@ -1,117 +1,74 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Presensi Otomatis Guru</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-  body { font-family: Arial, sans-serif; max-width: 600px; margin: 2rem auto; padding: 1rem; background:#f0f4f8; text-align:center; }
-  #notif { margin-top: 2rem; font-size: 1.2rem; font-weight: 600; padding: 1rem; border-radius: 0.5rem; }
-  .valid { background: #dcfce7; color: #16a34a; border: 2px solid #16a34a; }
-  .invalid { background: #fee2e2; color: #dc2626; border: 2px solid #dc2626; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presensi Guru</title>
+    <script src="https://cdn.jsdelivr.net/npm/ @supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f0f4f8;
+        }
+        .notif {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
 </head>
 <body>
-  <h1>Presensi Otomatis Guru</h1>
-  <div id="notif">Memproses presensi...</div>
+    <h1>Presensi Guru</h1>
+    <div id="message" class="notif"></div>
 
-  <script>
-  (async () => {
-    const SUPABASE_URL = 'https://lfylqrgvcrbnkyvudtgj.supabase.co';
-    const SUPABASE_ANON_KEY = 'your_anon_key_here';
+    <script>
+        // Konfigurasi Supabase
+        const SUPABASE_URL = 'https://lfylqrgvcrbnkyvudtgj.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmeWxxcmd2Y3Jibmt5dnVkdGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTc3NTE3ODksImV4cCI6MjA2ODU0OTc4OX0.pw9jKov4bpHoiCM31mS8I4PfUAk39mqX2eeF69Gs1ag';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    const notifDiv = document.getElementById('notif');
+        // Ambil parameter dari URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const nip = urlParams.get('nip');
+        const jenis = urlParams.get('jenis');
 
-    function getQueryParam(param) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(param);
-    }
+        // Tampilkan pesan loading
+        const messageDiv = document.getElementById('message');
+        messageDiv.textContent = 'Memproses presensi...';
 
-    const nip = getQueryParam('nip');
-    const jenis = getQueryParam('jenis'); // masuk / pulang
-
-    if (!nip || !jenis) {
-      notifDiv.className = 'invalid';
-      notifDiv.textContent = 'Parameter URL tidak lengkap. Scan QR code yang benar.';
-      return;
-    }
-
-    // Tentukan hari dan jam pelajaran sekarang
-    const hariList = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-    const now = new Date();
-    const hari = hariList[now.getDay()];
-
-    function getJamPelajaran(date) {
-      const jam = date.getHours();
-      const menit = date.getMinutes();
-
-      if ((jam === 7 && menit >= 0 && menit < 45)) return 'I';
-      if ((jam === 7 && menit >= 45) || (jam === 8 && menit < 30)) return 'II';
-      if ((jam === 8 && menit >= 30 && menit < 75)) return 'III';
-      // Tambah jam pelajaran sesuai kebutuhan
-      return null;
-    }
-
-    const jam = getJamPelajaran(now);
-
-    if (!jam) {
-      notifDiv.className = 'invalid';
-      notifDiv.textContent = 'Saat ini bukan jam pelajaran. Presensi tidak valid.';
-      return;
-    }
-
-    // Cari jadwal valid
-    let { data: jadwal, error: jadwalError } = await supabase
-      .from('jadwal')
-      .select('*')
-      .eq('NIP', nip)
-      .eq('Hari', hari)
-      .eq('Jam', jam)
-      .limit(1);
-
-    if (jadwalError) {
-      notifDiv.className = 'invalid';
-      notifDiv.textContent = 'Kesalahan pengecekan jadwal: ' + jadwalError.message;
-      return;
-    }
-
-    if (!jadwal || jadwal.length === 0) {
-      notifDiv.className = 'invalid';
-      notifDiv.textContent = 'Tidak valid: Anda tidak dijadwalkan mengajar saat ini.';
-      return;
-    }
-
-    // Simpan data presensi
-    const deviceInfo = navigator.userAgent;
-    const waktuScan = now.toISOString();
-
-    let { error: insertError } = await supabase
-      .from('presensi')
-      .insert([
-        {
-          NIP: nip,
-          Nama: jadwal[0].Nama,
-          'Waktu Scan': waktuScan,
-          Hari: hari,
-          Kelas: jadwal[0].Kelas,
-          Jam: jam,
-          'Device info': deviceInfo,
-          Jenis: jenis
+        // Validasi parameter
+        if (!nip || !jenis) {
+            messageDiv.className = 'notif error';
+            messageDiv.innerHTML = 'Parameter tidak lengkap!<br>Scan QR Code yang valid.';
+            throw new Error('Invalid parameters');
         }
-      ]);
 
-    if (insertError) {
-      notifDiv.className = 'invalid';
-      notifDiv.textContent = 'Gagal simpan presensi: ' + insertError.message;
-      return;
-    }
+        // Simpan data ke Supabase
+        async function submitAttendance() {
+            const { error } = await supabase
+                .from('presensi')
+                .insert({
+                    nip: nip,
+                    jenis: jenis,
+                    waktu: new Date().toISOString(),
+                    device: navigator.userAgent
+                });
 
-    // Tampilkan notifikasi sukses
-    notifDiv.className = 'valid';
-    notifDiv.textContent = `Presensi valid! Anda mengajar di kelas ${jadwal[0].Kelas} pada jam pelajaran ${jam}. Terima kasih.`;
-  })();
-  </script>
+            if (error) {
+                messageDiv.className = 'notif error';
+                messageDiv.textContent = `Gagal: ${error.message}`;
+            } else {
+                messageDiv.className = 'notif success';
+                messageDiv.innerHTML = `Presensi ${jenis} berhasil!<br>NIP: ${nip}`;
+            }
+        }
+
+        submitAttendance();
+    </script>
 </body>
 </html>
