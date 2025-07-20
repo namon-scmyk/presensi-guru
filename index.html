@@ -46,20 +46,18 @@
 
   <script>
     (async () => {
-      // Konfigurasi Supabase
       const SUPABASE_URL = 'https://lfylqrgvcrbnkyvudtgj.supabase.co';
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmeWxxcmd2Y3Jibmt5dnVkdGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzM3ODksImV4cCI6MjA2ODU0OTc4OX0.pw9jKov4bpHoiCM31mS8I4PfUAk39mqX2eeF69Gs1ag';
 
       const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       const notifDiv = document.getElementById('notif');
 
-      // Fungsi bantu ambil parameter URL
+      // Ambil parameter URL
       function getQueryParam(param) {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(param);
       }
 
-      // Ambil parameter nip dan jenis
       const nip = getQueryParam('nip');
       const jenis = getQueryParam('jenis'); // masuk/pulang
 
@@ -69,30 +67,21 @@
         return;
       }
 
-      // Dapatkan hari dan jam saat ini untuk validasi
+      // Hari saat ini
       const hariList = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
       const now = new Date();
       const hari = hariList[now.getDay()];
 
-      // Tentukan jam pelajaran keberapa berdasarkan jam dan menit sekarang (bisa disesuaikan)
-      // Contoh sederhana:
-      // I: 07:00 - 07:45
-      // II: 07:45 - 08:30
-      // III: 08:30 - 09:15
-      // dst, sesuaikan dengan jadwal sekolah Anda
-
+      // Fungsi menentukan jam pelajaran (disesuaikan dengan jadwal sekolah)
       function getJamPelajaran(date) {
         const jam = date.getHours();
         const menit = date.getMinutes();
 
-        if ((jam === 7 && menit >= 0) || (jam === 8 && menit < 30)) {
-          if (menit < 45) return 'I';
-          else return 'II';
-        }
-        if ((jam === 8 && menit >= 30) || (jam === 9 && menit < 15)) return 'III';
-        if ((jam === 9 && menit >= 15) || (jam === 10 && menit < 0)) return 'IV';
-        if ((jam === 10 && menit >= 0) || (jam === 11 && menit < 0)) return 'V';
-        // Tambah aturan jika perlu...
+        if (jam === 7 && menit >= 0 && menit < 45) return 'I';
+        if ((jam === 7 && menit >= 45) || (jam === 8 && menit < 30)) return 'II';
+        if ((jam === 8 && menit >= 30 && menit < 45)) return 'III';
+        if ((jam === 8 && menit >= 45) || (jam === 9 && menit < 30)) return 'IV';
+        if ((jam === 9 && menit >= 30) || (jam === 10 && menit < 15)) return 'V';
         return 'Tidak dalam jam pelajaran';
       }
 
@@ -104,9 +93,9 @@
         return;
       }
 
-      // Query jadwal dari supabase sesuai nip, hari, jam
+      // Cek jadwal guru di tabel 'jadwal'
       const { data: jadwal, error: jadwalError } = await supabase
-        .from('presensi')
+        .from('jadwal')
         .select('*')
         .eq('NIP', nip)
         .eq('Hari', hari)
@@ -125,7 +114,7 @@
         return;
       }
 
-      // Jika valid, masukkan data presensi ke supabase
+      // Insert data presensi ke tabel 'presensi'
       const deviceInfo = navigator.userAgent;
       const waktuScan = now.toISOString();
 
@@ -150,7 +139,7 @@
         return;
       }
 
-      // Tampilkan notifikasi sukses
+      // Notifikasi valid
       notifDiv.className = 'valid';
       notifDiv.textContent = `Presensi valid! Anda mengajar di kelas ${jadwal[0].Kelas} pada jam pelajaran ${jam}. Terima kasih.`;
     })();
