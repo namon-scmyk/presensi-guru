@@ -27,48 +27,59 @@
     <div id="message" class="notif"></div>
 
     <script>
-        // Konfigurasi Supabase
-        const SUPABASE_URL = 'https://lfylqrgvcrbnkyvudtgj.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmeWxxcmd2Y3Jibmt5dnVkdGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTc3NTE3ODksImV4cCI6MjA2ODU0OTc4OX0.pw9jKov4bpHoiCM31mS8I4PfUAk39mqX2eeF69Gs1ag';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // Ambil parameter dari URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const nip = urlParams.get('nip');
-        const jenis = urlParams.get('jenis');
-
-        // Tampilkan pesan loading
-        const messageDiv = document.getElementById('message');
-        messageDiv.textContent = 'Memproses presensi...';
-
-        // Validasi parameter
-        if (!nip || !jenis) {
-            messageDiv.className = 'notif error';
-            messageDiv.innerHTML = 'Parameter tidak lengkap!<br>Scan QR Code yang valid.';
-            throw new Error('Invalid parameters');
-        }
-
-        // Simpan data ke Supabase
-        async function submitAttendance() {
-            const { error } = await supabase
-                .from('presensi')
-                .insert({
-                    nip: nip,
-                    jenis: jenis,
-                    waktu: new Date().toISOString(),
-                    device: navigator.userAgent
-                });
-
-            if (error) {
+        // Tunggu hingga Supabase JS dimuat
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Pastikan Supabase sudah tersedia
+            if (typeof supabase === 'undefined') {
+                const messageDiv = document.getElementById('message');
                 messageDiv.className = 'notif error';
-                messageDiv.textContent = `Gagal: ${error.message}`;
-            } else {
-                messageDiv.className = 'notif success';
-                messageDiv.innerHTML = `Presensi ${jenis} berhasil!<br>NIP: ${nip}`;
+                messageDiv.textContent = 'Gagal memuat klien Supabase. Periksa koneksi internet.';
+                return;
             }
-        }
 
-        submitAttendance();
+            // Inisialisasi Supabase
+            const SUPABASE_URL = 'https://lfylqrgvcrbnkyvudtgj.supabase.co';
+            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmeWxxcmd2Y3Jibmt5dnVkdGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTc3NTE3ODksImV4cCI6MjA2ODU0OTc4OX0.pw9jKov4bpHoiCM31mS8I4PfUAk39mqX2eeF69Gs1ag';
+            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+            // Ambil parameter dari URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const nip = urlParams.get('nip');
+            const jenis = urlParams.get('jenis');
+
+            // Tampilkan pesan loading
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = 'Memproses presensi...';
+
+            // Validasi parameter
+            if (!nip || !jenis) {
+                messageDiv.className = 'notif error';
+                messageDiv.innerHTML = 'Parameter tidak lengkap!<br>Scan QR Code yang valid.';
+                throw new Error('Invalid parameters');
+            }
+
+            // Simpan data ke Supabase
+            async function submitAttendance() {
+                const { error } = await supabaseClient
+                    .from('presensi')
+                    .insert({
+                        nip: nip,
+                        jenis: jenis,
+                        waktu: new Date().toISOString(),
+                        device: navigator.userAgent
+                    });
+
+                if (error) {
+                    messageDiv.className = 'notif error';
+                    messageDiv.textContent = `Gagal: ${error.message}`;
+                } else {
+                    messageDiv.className = 'notif success';
+                    messageDiv.innerHTML = `Presensi ${jenis} berhasil!<br>NIP: ${nip}`;
+                }
+            }
+
+            submitAttendance();
+        });
     </script>
 </body>
 </html>
