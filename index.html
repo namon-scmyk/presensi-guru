@@ -104,8 +104,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
       // Perbaiki URL dan API key (hilangkan spasi berlebih)
       const SUPABASE_URL = 'https://lfylqrgvcrbnkyvudtgj.supabase.co';
-      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmeWxxcmd2Y3Jibmt5dnVkdGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzM3ODksImV4cCI6MjA2ODU0OTc4OX0.pw9jKov4bpHoiCM31mS8I4PfUAk39mqX2eeF69Gs1ag';
-
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxmeWxxcmd2Y3Jibmt5dnVkdGdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5NzM3ODksImV4cCI6MjA2ODU0OTc4OX0.pw9jKov4bpHoiCM31mS8I4PfUAk39mqX2eeF69Gs1ag'
       // Periksa apakah Supabase berhasil dimuat
       if (typeof supabase === 'undefined' || !supabase.createClient) {
         const resultDiv = document.getElementById('result');
