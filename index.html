@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Aplikasi absensi guru berbasis web" />
   <meta name="keywords" content="absensi, guru, sekolah" />
-  <meta name="author" content="SMK Negeri XXX" />
+  <meta name="author" content="SMA NEGERI 1 LIMBOTO" />
   <title>Absensi Guru</title>
   <!-- Ikon untuk iPhone & PWA -->
   <link rel="apple-touch-icon" href="/icon.png" />
@@ -171,7 +171,7 @@
         <option value="Sosiologi">Sosiologi</option>
         <option value="Ekonomi">Ekonomi</option>
         <option value="Sejarah">Sejarah</option>
-        <option value="Sejarah">Sejarah Peminatan</option>
+        <option value="Sejarah Peminatan">Sejarah Peminatan</option>
         <option value="Geografi">Geografi</option>
         <option value="Bahasa Inggris">Bahasa Inggris</option>
         <option value="PJOK">PJOK</option>
@@ -363,7 +363,6 @@
         });
       }
       
-      // Reset nama guru yang tersimpan
       localStorage.removeItem('namaGuru');
       guruSelect.disabled = false;
     });
@@ -375,7 +374,7 @@
       guruSelect.disabled = true;
     }
 
-    // 🔥 URL BACKEND ANDA
+    // URL backend terbaru
     const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbyUwNGtKZhsBaB1ppn5_lr5qwGVxz_tZxPATnFBu00u5W6hamisTtzeeGhY76m87O-C/exec';
 
     // Fungsi untuk format waktu lokal (WITA)
@@ -411,79 +410,83 @@
       const kelas = kelasSelect.value?.trim();
       const nama = guruSelect.value?.trim();
 
-      // Validasi input
+      console.log('Data yang akan dikirim:', { guru: nama, mapel, kelas, tipe });
+
       if (!mapel) {
         result.innerHTML = `<span class="error">❌ Pilih mata pelajaran dulu.</span>`;
         isProcessing = false;
         return;
       }
-
       if (!kelas) {
         result.innerHTML = `<span class="error">❌ Pilih kelas dulu.</span>`;
         isProcessing = false;
         return;
       }
-
       if (!nama) {
         result.innerHTML = `<span class="error">❌ Pilih nama Anda dulu.</span>`;
         isProcessing = false;
         return;
       }
 
-      // Simpan nama guru
       localStorage.setItem('namaGuru', nama);
 
-      // Nonaktifkan tombol dan tampilkan loading
       document.querySelectorAll('.btn:not(.btn-reset)').forEach(btn => {
         btn.disabled = true;
         btn.style.opacity = '0.7';
       });
       result.textContent = 'Mengirim...';
 
-      // Data yang akan dikirim
-      const data = {
-        guru: nama,
-        mapel: mapel,
-        kelas: kelas,
-        tipe: tipe
-      };
+      const data = { guru: nama, mapel, kelas, tipe };
 
-      try {
-        // Tambahkan delay acak untuk menghindari beban bersamaan
-        await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
-        
-        // Kirim ke backend
-        const res = await fetch(BACKEND_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data),
-          redirect: 'follow',
-          muteHttpExceptions: true
-        });
+      let attempt = 0;
+      const maxAttempts = 3;
 
-        const responseText = await res.text();
-        let responseJson;
-        
+      while (attempt < maxAttempts) {
         try {
-          responseJson = JSON.parse(responseText);
-        } catch (e) {
-          throw new Error('Respon tidak valid dari server');
-        }
+          await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
+          const res = await fetch(BACKEND_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
+            redirect: 'follow'
+          });
 
-        if (responseJson.status === 'success') {
-          result.innerHTML = `<span class="success">✅ Berhasil! Absensi ${tipe} tercatat pada ${formatTime()}.</span>`;
-          localStorage.removeItem('pendingAbsensi');
-        } else {
-          throw new Error(responseJson.message || 'Gagal menyimpan data');
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+
+          const responseText = await res.text();
+          let responseJson;
+          try {
+            responseJson = JSON.parse(responseText);
+          } catch (e) {
+            throw new Error('Respon tidak valid dari server');
+          }
+
+          if (responseJson.status === 'success') {
+            result.innerHTML = `<span class="success">✅ Berhasil! Absensi ${tipe} tercatat pada ${formatTime()}.</span>`;
+            localStorage.removeItem('pendingAbsensi');
+            break;
+          } else {
+            throw new Error(responseJson.message || 'Gagal menyimpan data');
+          }
+        } catch (err) {
+          attempt++;
+          console.error(`Fetch error (attempt ${attempt}/${maxAttempts}):`, err);
+          if (attempt === maxAttempts) {
+            result.innerHTML = `<span class="error">❌ Gagal: ${err.message || 'Periksa koneksi internet atau coba lagi nanti.'}</span>`;
+            localStorage.setItem('pendingAbsensi', JSON.stringify(data));
+            result.innerHTML += `<br><button class="btn btn-retry" onclick="retryAbsen()">Coba Lagi</button>`;
+          } else {
+            result.textContent = `Mengirim... (Percobaan ${attempt}/${maxAttempts})`;
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Tunggu 1 detik sebelum retry
+          }
         }
-        
-      } catch (err) {
-        result.innerHTML = `<span class="error">❌ Gagal: ${err.message || 'Periksa koneksi internet.'}</span>`;
-        localStorage.setItem('pendingAbsensi', JSON.stringify(data));
-        result.innerHTML += `<br><button class="btn btn-retry" onclick="retryAbsen()">Coba Lagi</button>`;
-      } finally {
+      }
+
+      if (attempt === maxAttempts) {
         isProcessing = false;
         document.querySelectorAll('.btn:not(.btn-reset)').forEach(btn => {
           btn.disabled = false;
@@ -503,38 +506,51 @@
       const data = JSON.parse(pendingData);
       result.textContent = 'Mencoba ulang...';
 
-      try {
-        // Tambahkan delay acak
-        await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
-        
-        const res = await fetch(BACKEND_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data),
-          redirect: 'follow',
-          muteHttpExceptions: true
-        });
+      let attempt = 0;
+      const maxAttempts = 3;
 
-        const responseText = await res.text();
-        let responseJson;
-        
+      while (attempt < maxAttempts) {
         try {
-          responseJson = JSON.parse(responseText);
-        } catch (e) {
-          throw new Error('Respon tidak valid dari server');
-        }
+          await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
+          const res = await fetch(BACKEND_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data),
+            redirect: 'follow'
+          });
 
-        if (responseJson.status === 'success') {
-          result.innerHTML = `<span class="success">✅ Berhasil! Absensi ${data.tipe} tercatat pada ${formatTime()}.</span>`;
-          localStorage.removeItem('pendingAbsensi');
-        } else {
-          throw new Error(responseJson.message || 'Gagal menyimpan data');
+          if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
+
+          const responseText = await res.text();
+          let responseJson;
+          try {
+            responseJson = JSON.parse(responseText);
+          } catch (e) {
+            throw new Error('Respon tidak valid dari server');
+          }
+
+          if (responseJson.status === 'success') {
+            result.innerHTML = `<span class="success">✅ Berhasil! Absensi ${data.tipe} tercatat pada ${formatTime()}.</span>`;
+            localStorage.removeItem('pendingAbsensi');
+            break;
+          } else {
+            throw new Error(responseJson.message || 'Gagal menyimpan data');
+          }
+        } catch (err) {
+          attempt++;
+          console.error(`Retry error (attempt ${attempt}/${maxAttempts}):`, err);
+          if (attempt === maxAttempts) {
+            result.innerHTML = `<span class="error">❌ Gagal: ${err.message || 'Periksa koneksi internet atau coba lagi nanti.'}</span>`;
+            result.innerHTML += `<br><button class="btn btn-retry" onclick="retryAbsen()">Coba Lagi</button>`;
+          } else {
+            result.textContent = `Mencoba ulang... (Percobaan ${attempt}/${maxAttempts})`;
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Tunggu 1 detik sebelum retry
+          }
         }
-      } catch (err) {
-        result.innerHTML = `<span class="error">❌ Gagal: ${err.message || 'Periksa koneksi internet.'}</span>`;
-        result.innerHTML += `<br><button class="btn btn-retry" onclick="retryAbsen()">Coba Lagi</button>`;
       }
     }
 
