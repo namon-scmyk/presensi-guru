@@ -223,52 +223,48 @@
       guruSelect.disabled = true;
     }
 
-    // 🔁 GANTI INI DENGAN INFO DARI SUPABASE ANDA
-    // Isi di komputer lokal, JANGAN UPLOAD KE GITHUB
-    const SUPABASE_URL = 'https://rgvpnzorfukkgjjnvozo.supabase.co';
-    const SUPABASE_KEY = ''; // ← KOSONGKAN SAAT UPLOAD
+    // 🔁 GANTI INI DENGAN IP PUBLIK SERVER ANDA
+    // Contoh: http://36.85.222.220:3000/submit
+    const SERVER_LOCAL = 'http://36.85.222.220:3000/submit';
 
     function absen(tipe) {
       const nama = guruSelect.value;
       if (!nama) {
         alert("Pilih nama Anda dulu");
         return;
+      }
+
+      localStorage.setItem('namaGuru', nama);
+
+      fetch(SERVER_LOCAL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          guru: nama,
+          kelas: kelas,
+          tipe: tipe
+        })
+      })
+      .then(res => {
+        if (res.ok) {
+          document.getElementById('result').innerHTML = 
+            `<span class="success">✅ Berhasil! Absensi ${tipe} tercatat.</span>`;
+        } else {
+          throw new Error();
+        }
+      })
+      .catch(err => {
+        document.getElementById('result').innerHTML = 
+          `<span class="error">❌ Gagal kirim data. Periksa jaringan ke server.</span>`;
+      });
+
+      document.querySelectorAll('.btn').forEach(btn => {
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+      });
     }
-
-  // Ganti URL ke server lokal Anda
-  const SERVER_LOCAL = 'http://36.85.222.220:3000/submit'; // ← IP publik Anda
-
-  fetch(SERVER_LOCAL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      guru: nama,
-      kelas: kelas,
-      tipe: tipe
-    })
-  })
-  .then(res => {
-    if (res.ok) {
-      document.getElementById('result').innerHTML = 
-        `<span class="success">✅ Berhasil! Absensi ${tipe} tercatat.</span>`;
-    } else {
-      throw new Error();
-    }
-  })
-  .catch(err => {
-    document.getElementById('result').innerHTML = 
-      `<span class="error">❌ Gagal kirim data. Periksa jaringan.</span>`;
-  });
-
-  document.querySelectorAll('.btn').forEach(btn => {
-    btn.disabled = true;
-    btn.style.opacity = '0.7';
-  });
-}
   </script>
 </body>
-
 </html>
-
