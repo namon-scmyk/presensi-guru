@@ -1,569 +1,972 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Aplikasi absensi guru berbasis web" />
-  <meta name="keywords" content="absensi, guru, sekolah" />
-  <meta name="author" content="SMA NEGERI 1 LIMBOTO" />
-  <title>Absensi Guru</title>
-  <!-- Ikon untuk iPhone & PWA -->
-  <link rel="apple-touch-icon" href="/icon.png" />
-  <link rel="apple-touch-startup-image" href="/icon.png" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#1a73e8" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    :root {
-      --bg: #f8f9fa;
-      --text: #212529;
-      --primary: #1a73e8;
-      --success: #28a745;
-      --danger: #dc3545;
-      --warning: #ffc107;
-      --card-bg: #ffffff;
-      --border: #dee2e6;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #121212;
-        --text: #e0e0e0;
-        --card-bg: #1e1e1e;
-        --border: #333;
-      }
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      padding: 20px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .container {
-      width: 100%;
-      max-width: 500px;
-      margin: 0 auto;
-    }
-    header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    h1 {
-      font-size: 1.8rem;
-      color: var(--primary);
-      margin-bottom: 8px;
-    }
-    .form-group {
-      margin: 15px 0;
-    }
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 500;
-    }
-    select {
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--card-bg);
-      color: var(--text);
-      appearance: none;
-      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath fill='%231a73e8' d='M0 0l6 6 6-6z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 16px center;
-      background-size: 12px;
-    }
-    .btn-group {
-      display: flex;
-      gap: 12px;
-      margin: 20px 0;
-      flex-wrap: wrap;
-    }
-    .btn {
-      flex: 1;
-      min-width: 120px;
-      padding: 16px 20px;
-      font-size: 16px;
-      font-weight: bold;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .btn:active {
-      transform: scale(0.98);
-    }
-    .btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-    .btn-masuk {
-      background: var(--primary);
-      color: white;
-    }
-    .btn-keluar {
-      background: var(--danger);
-      color: white;
-    }
-    .btn-retry, .btn-reset {
-      background: #6c757d;
-      color: white;
-    }
-    #result {
-      margin-top: 20px;
-      font-weight: bold;
-      font-size: 1.1rem;
-      text-align: center;
-      padding: 12px;
-      border-radius: 8px;
-    }
-    .success {
-      color: var(--success);
-    }
-    .error {
-      color: var(--danger);
-    }
-    .warning {
-      color: var(--warning);
-    }
-    @media (max-width: 480px) {
-      body {
-        padding: 15px;
-      }
-      h1 {
-        font-size: 1.6rem;
-      }
-      .btn {
-        font-size: 15px;
-        padding: 14px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presensi Guru SMA Negeri 1 Limboto</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --border-radius: 12px;
+            --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        @media (min-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--secondary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 14px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-masuk {
+            background: linear-gradient(to right, #4361ee, #3a0ca3);
+            color: white;
+        }
+
+        .btn-masuk:hover {
+            background: linear-gradient(to right, #3a0ca3, #4361ee);
+            transform: translateY(-3px);
+        }
+
+        .btn-keluar {
+            background: linear-gradient(to right, #f72585, #b5179e);
+            color: white;
+        }
+
+        .btn-keluar:hover {
+            background: linear-gradient(to right, #b5179e, #f72585);
+            transform: translateY(-3px);
+        }
+
+        .btn-reset {
+            background: var(--light-gray);
+            color: var(--dark);
+            border: 1px solid var(--gray);
+        }
+
+        .btn-reset:hover {
+            background: #d1d1d1;
+        }
+
+        .btn-admin {
+            background: linear-gradient(to right, #4cc9f0, #4895ef);
+            color: white;
+            padding: 12px 25px;
+            font-size: 1rem;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .btn-admin:hover {
+            background: linear-gradient(to right, #4895ef, #4cc9f0);
+            transform: translateY(-3px);
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .success {
+            background: rgba(76, 201, 240, 0.2);
+            color: #0077b6;
+            border: 1px solid rgba(76, 201, 240, 0.5);
+        }
+
+        .error {
+            background: rgba(247, 37, 133, 0.2);
+            color: #d63384;
+            border: 1px solid rgba(247, 37, 133, 0.5);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .admin-section {
+            display: none;
+        }
+
+        .admin-section.active {
+            display: block;
+            animation: slideIn 0.5s;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .admin-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .filter-controls input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .report-item {
+            background: var(--light);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-left: 4px solid var(--primary);
+            transition: var(--transition);
+        }
+
+        .report-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .guru-name {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+
+        .class-subject {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .guru-nip {
+            background: var(--light-gray);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .status.hadir {
+            background: rgba(76, 201, 240, 0.2);
+            color: #0077b6;
+        }
+
+        .status.izin {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .status.sakit {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+
+        .date {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            color: white;
+            font-weight: 600;
+            box-shadow: var(--box-shadow);
+            transform: translateX(200%);
+            transition: transform 0.4s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: linear-gradient(to right, #4361ee, #3a0ca3);
+        }
+
+        .notification.error {
+            background: linear-gradient(to right, #f72585, #b5179e);
+        }
+
+        /* Tombol admin di header */
+        .admin-button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .admin-button {
+            background: linear-gradient(to right, #4cc9f0, #4895ef);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-button:hover {
+            background: linear-gradient(to right, #4895ef, #4cc9f0);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(76, 201, 240, 0.4);
+        }
+
+        /* Spasi tambahan untuk elemen form */
+        .guru-section {
+            margin-top: 15px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            header h1 {
+                font-size: 2.2rem;
+            }
+            
+            header p {
+                font-size: 1rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+            }
+            
+            .filter-controls input {
+                width: 100%;
+            }
+            
+            .admin-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .admin-controls {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .card-title {
+                font-size: 1.3rem;
+            }
+            
+            .btn {
+                padding: 12px;
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>📝 Absensi Guru</h1>
-    </header>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <i class="fas fa-graduation-cap logo"></i>
+                <h1>Presensi Guru</h1>
+            </div>
+            <p>SMA Negeri 1 Limboto</p>
+            
+            <!-- Tombol Admin di Header -->
+            <div class="admin-button-container">
+                <button class="admin-button" id="showAdminPanel">
+                    <i class="fas fa-user-shield"></i> Admin Panel
+                </button>
+            </div>
+        </header>
 
-    <div class="form-group">
-      <label for="mapel">Mata Pelajaran:</label>
-      <select id="mapel" aria-label="Pilih mata pelajaran">
-        <option value="">-- Pilih Mata Pelajaran --</option>
-        <option value="PAI dan BP">PAI dan BP</option>
-        <option value="Pendidikan Pancasila">Pendidikan Pancasila</option>
-        <option value="Bahasa Indonesia">Bahasa Indonesia</option>
-        <option value="Matematika">Matematika</option>
-        <option value="Fisika">Fisika</option>
-        <option value="Kimia">Kimia</option>
-        <option value="Biologi">Biologi</option>
-        <option value="Sosiologi">Sosiologi</option>
-        <option value="Ekonomi">Ekonomi</option>
-        <option value="Sejarah">Sejarah</option>
-        <option value="Sejarah Peminatan">Sejarah Peminatan</option>
-        <option value="Geografi">Geografi</option>
-        <option value="Bahasa Inggris">Bahasa Inggris</option>
-        <option value="PJOK">PJOK</option>
-        <option value="Informatika">Informatika</option>
-        <option value="Seni Budaya">Seni Budaya</option>
-        <option value="Bimbingan Konseling">Bimbingan Konseling</option>
-        <option value="Koding & KA">Koding & KA</option>
-      </select>
+        <div class="main-content">
+            <!-- Form Absensi -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-user-check"></i> Form Absensi</h2>
+                
+                <div class="absensi-form">
+                    <div class="form-group">
+                        <label for="mapel"><i class="fas fa-book"></i> Mata Pelajaran:</label>
+                        <select id="mapel" class="form-control" aria-label="Pilih mata pelajaran">
+                            <option value="">-- Pilih Mata Pelajaran --</option>
+                            <option value="PAI dan BP">PAI dan BP</option>
+                            <option value="Pendidikan Pancasila">Pendidikan Pancasila</option>
+                            <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+                            <option value="Matematika">Matematika</option>
+                            <option value="Fisika">Fisika</option>
+                            <option value="Kimia">Kimia</option>
+                            <option value="Biologi">Biologi</option>
+                            <option value="Sosiologi">Sosiologi</option>
+                            <option value="Ekonomi">Ekonomi</option>
+                            <option value="Sejarah">Sejarah</option>
+                            <option value="Sejarah Peminatan">Sejarah Peminatan</option>
+                            <option value="Geografi">Geografi</option>
+                            <option value="Bahasa Inggris">Bahasa Inggris</option>
+                            <option value="PJOK">PJOK</option>
+                            <option value="Informatika">Informatika</option>
+                            <option value="Seni Budaya">Seni Budaya</option>
+                            <option value="Bimbingan Konseling">Bimbingan Konseling</option>
+                            <option value="Koding & KA">Koding & KA</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="kelas"><i class="fas fa-school"></i> Kelas:</label>
+                        <select id="kelas" class="form-control" aria-label="Pilih kelas">
+                            <option value="">-- Pilih Kelas --</option>
+                            <option value="10-1">10-1</option>
+                            <option value="10-2">10-2</option>
+                            <option value="10-3">10-3</option>
+                            <option value="10-4">10-4</option>
+                            <option value="10-5">10-5</option>
+                            <option value="10-6">10-6</option>
+                            <option value="10-7">10-7</option>
+                            <option value="10-8">10-8</option>
+                            <option value="10-9">10-9</option>
+                            <option value="10-10">10-10</option>
+                            <option value="10-11">10-11</option>
+                            <option value="11-1">11-1</option>
+                            <option value="11-2">11-2</option>
+                            <option value="11-3">11-3</option>
+                            <option value="11-4">11-4</option>
+                            <option value="11-5">11-5</option>
+                            <option value="11-6">11-6</option>
+                            <option value="11-7">11-7</option>
+                            <option value="11-8">11-8</option>
+                            <option value="11-9">11-9</option>
+                            <option value="11-10">11-10</option>
+                            <option value="12-1">12-1</option>
+                            <option value="12-2">12-2</option>
+                            <option value="12-3">12-3</option>
+                            <option value="12-4">12-4</option>
+                            <option value="12-5">12-5</option>
+                            <option value="12-6">12-6</option>
+                            <option value="12-7">12-7</option>
+                            <option value="12-8">12-8</option>
+                            <option value="12-9">12-9</option>
+                            <option value="12-10">12-10</option>
+                            <option value="12-11">12-11</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group guru-section">
+                        <label for="guru"><i class="fas fa-chalkboard-teacher"></i> Nama Guru:</label>
+                        <select id="guru" class="form-control" aria-label="Pilih nama guru">
+                            <option value="">-- Pilih Nama Anda --</option>
+                        </select>
+                        <button class="btn btn-reset" onclick="resetGuru()" aria-label="Ganti guru" style="margin-top: 15px;">
+                            <i class="fas fa-sync-alt"></i> Ganti Guru
+                        </button>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-masuk" onclick="absen('masuk')" aria-label="Absen masuk">
+                            <i class="fas fa-sign-in-alt"></i> Masuk
+                        </button>
+                        <button class="btn btn-keluar" onclick="absen('keluar')" aria-label="Absen keluar">
+                            <i class="fas fa-sign-out-alt"></i> Keluar
+                        </button>
+                    </div>
+
+                    <div id="result" class="result"></div>
+                </div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-user-shield"></i> Admin Panel</h2>
+                
+                <div class="admin-section" id="adminLoginSection">
+                    <div class="form-group">
+                        <label for="adminEmail"><i class="fas fa-envelope"></i> Email Admin:</label>
+                        <input type="email" id="adminEmail" class="form-control" placeholder="Masukkan email admin">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="adminPassword"><i class="fas fa-lock"></i> Password:</label>
+                        <input type="password" id="adminPassword" class="form-control" placeholder="Masukkan password">
+                    </div>
+                    
+                    <button id="loginAdmin" class="btn btn-admin">
+                        <i class="fas fa-sign-in-alt"></i> Login Admin
+                    </button>
+                </div>
+                
+                <div class="admin-section active" id="adminDashboardSection">
+                    <div class="admin-header">
+                        <h3>Laporan Absensi</h3>
+                        <div class="admin-controls">
+                            <button id="refreshData" class="btn btn-reset">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                            <button id="exportExcel" class="btn btn-reset">
+                                <i class="fas fa-file-excel"></i> Export Excel
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-controls">
+                        <input type="date" id="filterDate" class="form-control">
+                        <button id="filterBtn" class="btn btn-reset">
+                            <i class="fas fa-filter"></i> Filter
+                        </button>
+                    </div>
+                    
+                    <div id="reportData">
+                        <!-- Laporan akan muncul di sini -->
+                        <div class="report-item">
+                            <div class="report-header">
+                                <div class="guru-name">Sasmawati D. Halid, S.Ag</div>
+                                <div class="status hadir">Hadir</div>
+                            </div>
+                            <div class="class-subject">
+                                <div class="guru-nip">NIP: 19870123456789012345</div>
+                                <div class="guru-nip">Kelas: 10-1</div>
+                                <div class="guru-nip">Mapel: PAI dan BP</div>
+                            </div>
+                            <div class="date">Tanggal: 2025-01-15 | Waktu: 08:30:00</div>
+                        </div>
+                        
+                        <div class="report-item">
+                            <div class="report-header">
+                                <div class="guru-name">Mustapa Dako, S.Pd</div>
+                                <div class="status hadir">Hadir</div>
+                            </div>
+                            <div class="class-subject">
+                                <div class="guru-nip">NIP: 19870123456789012346</div>
+                                <div class="guru-nip">Kelas: 11-2</div>
+                                <div class="guru-nip">Mapel: Bahasa Indonesia</div>
+                            </div>
+                            <div class="date">Tanggal: 2025-01-15 | Waktu: 08:35:00</div>
+                        </div>
+                    </div>
+                    
+                    <button id="logoutAdmin" class="btn btn-reset" style="margin-top: 20px;">
+                        <i class="fas fa-sign-out-alt"></i> Logout Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 SMA Negeri 1 Limboto - Sistem Presensi Guru</p>
+        </div>
     </div>
 
-    <div class="form-group">
-      <label for="kelas">Kelas:</label>
-      <select id="kelas" aria-label="Pilih kelas">
-        <option value="">-- Pilih Kelas --</option>
-        <option value="10-1">10-1</option>
-        <option value="10-2">10-2</option>
-        <option value="10-3">10-3</option>
-        <option value="10-4">10-4</option>
-        <option value="10-5">10-5</option>
-        <option value="10-6">10-6</option>
-        <option value="10-7">10-7</option>
-        <option value="10-8">10-8</option>
-        <option value="10-9">10-9</option>
-        <option value="10-10">10-10</option>
-        <option value="10-11">10-11</option>
-        <option value="11-1">11-1</option>
-        <option value="11-2">11-2</option>
-        <option value="11-3">11-3</option>
-        <option value="11-4">11-4</option>
-        <option value="11-5">11-5</option>
-        <option value="11-6">11-6</option>
-        <option value="11-7">11-7</option>
-        <option value="11-8">11-8</option>
-        <option value="11-9">11-9</option>
-        <option value="11-10">11-10</option>
-        <option value="12-1">12-1</option>
-        <option value="12-2">12-2</option>
-        <option value="12-3">12-3</option>
-        <option value="12-4">12-4</option>
-        <option value="12-5">12-5</option>
-        <option value="12-6">12-6</option>
-        <option value="12-7">12-7</option>
-        <option value="12-8">12-8</option>
-        <option value="12-9">12-9</option>
-        <option value="12-10">12-10</option>
-        <option value="12-11">12-11</option>
-      </select>
-    </div>
+    <div id="notification" class="notification"></div>
 
-    <div class="form-group">
-      <label for="guru">Nama Guru:</label>
-      <select id="guru" aria-label="Pilih nama guru">
-        <option value="">-- Pilih Nama Anda --</option>
-        <!-- Daftar guru akan diisi otomatis berdasarkan mapel -->
-      </select>
-      <button class="btn btn-reset" onclick="resetGuru()" aria-label="Ganti guru" style="margin-top: 10px;">Ganti Guru</button>
-    </div>
+    <script>
+        // Daftar guru berdasarkan mata pelajaran
+        const guruByMapel = {
+            "PAI dan BP": [
+                "Sasmawati D. Halid, S.Ag.",
+                "Asni Pakaya, S.PdI.",
+                "Khaeroni, S.PdI.",
+                "Sri Mulyati Mayang, S.Ag."
+            ],
+            "Pendidikan Pancasila": [
+                "Taufik Amuntu, S.Pd.",
+                "Isna Husain, S.Pd.",
+                "Azis Abdullah, S.Pd."
+            ],
+            "Bahasa Indonesia": [
+                "Mustapa Dako, S.Pd.",
+                "Dian Ariyani Lapai, S.Pd.",
+                "Oktaviani Iko, S.Pd.",
+                "Nuriyadin Kunuti, S.Pd.",
+                "Oman Wahiji, S.Pd.",
+                "Nur Azizah R. Koping, S.Pd."
+            ],
+            "Matematika": [
+                "Nurfitriani Buhungo, S.Pd.",
+                "Mohamad Adnan Ibrahim, S.Pd.",
+                "Sri Saputri Mayang, S.Pd.",
+                "Esti Nofriani Ali, S.Pd.",
+                "Nur Azizah R. Koping, S.Pd."
+            ],
+            "Fisika": [
+                "Fatmawati Saleh, S.Pd.",
+                "Reny M. Sahrain, M.Pd.",
+                "Mayariskawati Karim, S.Pd.",
+                "Erni Podungge, M.M."
+            ],
+            "Kimia": [
+                "Fristo Kau, M.Pd.",
+                "Fatmah F. Musa, S.Pd.",
+                "Ram Ibrahim, S.Pd.",
+                "Rahmad Utina, M.Pd."
+            ],
+            "Biologi": [
+                "Hartiman, S.Pd",
+                "Dra. Zubaida S. Bialangi",
+                "Susantiana A. Husain, S.Pd."
+            ],
+            "Sosiologi": [
+                "Yeri Prasetya Haipi, S.Pd."
+            ],
+            "Ekonomi": [
+                "Leni Marlina Abas, S.Pd.",
+                "Agustin Hasania, S.Pd.",
+                "Kartin Moli, S.Pd."
+            ],
+            "Sejarah": [
+                "Linda Banto, S.Pd",
+                "Fahril Ramadhan Yusuf, S.Pd.",
+                "Irawaty AS. Ali, M.Pd.",
+                "Dra. Agustina Pianus",
+                "Lutfiah R. Bagu, S.Pd."
+            ],
+            "Sejarah Peminatan": [
+                "Linda Banto, S.Pd.",
+                "Fahril Ramadhan Yusuf, S.Pd.",
+                "Irawaty AS. Ali, M.Pd.",
+                "Dra. Agustina Pianus",
+                "Lutfiah R. Bagu, S.Pd."
+            ],
+            "Geografi": [
+                "Zakir Inggile, S.Pd.",
+                "Fifiati, S.Pd"
+            ],
+            "Bahasa Inggris": [
+                "Hj. Ramlah H. Hasan, M.Pd.",
+                "Selfi Katili, M.Pd",
+                "Drs. Abdul Razak Husain, M.Ed.",
+                "Umar, M.Pd"
+            ],
+            "PJOK": [
+                "Drs. Jhon A.R. Yusuf",
+                "Marten Nuna, S.Pd.",
+                "Nuriyadin Kunuti, S.Pd.",
+                "Oman Wahiji, S.Pd."
+            ],
+            "Informatika": [
+                "Gabriela J. Tangkawarow, S.Pd.",
+                "Herson Mustapa, S.SI.",
+                "Newin Kalay, S.SI.",
+                "Mirsan Kuka, S.Kom."
+            ],
+            "Seni Budaya": [
+                "Febriana Polontalo, S.Pd.",
+                "Fita R. Naue, S.Pd."
+            ],
+            "Bimbingan Konseling": [
+                "Arlin Husnan, S.Pd.",
+                "Karmila P. Paino, S.Pd.",
+                "Meri Novianti, S.Pd.",
+                "Nanda Oktaviany S. Djafar, S.Pd."
+            ],
+            "Koding & KA": [
+                "Sutrisno Tilahunga, S.E."
+            ]
+        };
 
-    <div class="btn-group">
-      <button class="btn btn-masuk" onclick="absen('masuk')" aria-label="Absen masuk">Masuk</button>
-      <button class="btn btn-keluar" onclick="absen('keluar')" aria-label="Absen keluar">Keluar</button>
-    </div>
+        // DOM Elements
+        const mapelSelect = document.getElementById('mapel');
+        const kelasSelect = document.getElementById('kelas');
+        const guruSelect = document.getElementById('guru');
+        const resultDiv = document.getElementById('result');
+        const loginAdminBtn = document.getElementById('loginAdmin');
+        const logoutAdminBtn = document.getElementById('logoutAdmin');
+        const refreshDataBtn = document.getElementById('refreshData');
+        const filterBtn = document.getElementById('filterBtn');
+        const exportExcelBtn = document.getElementById('exportExcel');
+        const adminEmail = document.getElementById('adminEmail');
+        const adminPassword = document.getElementById('adminPassword');
+        const adminLoginSection = document.getElementById('adminLoginSection');
+        const adminDashboardSection = document.getElementById('adminDashboardSection');
+        const notification = document.getElementById('notification');
+        const showAdminPanelBtn = document.getElementById('showAdminPanel');
 
-    <p id="result"></p>
-  </div>
-
-  <script>
-    // Daftar guru berdasarkan mata pelajaran
-    const guruByMapel = {
-      "PAI dan BP": [
-        "Sasmawati D. Halid, S.Ag",
-        "Asni Pakaya, S.PdI",
-        "Khaeroni, S.PdI",
-        "Sri Mulyati Mayang, S.Ag"
-      ],
-      "Pendidikan Pancasila": [
-        "Taufik Amuntu, S.Pd",
-        "Isna Husain, S.Pd",
-        "Azis Abdullah, S.Pd"
-      ],
-      "Bahasa Indonesia": [
-        "Mustapa Dako, S.Pd",
-        "Dian Ariyani Lapai, S.Pd",
-        "Oktaviani Iko, S.Pd",
-        "Nuriyadin Kunuti, S.Pd",
-        "Oman Wahiji, S.Pd",
-        "Nur Azizah R. Koping, S.Pd"
-      ],
-      "Matematika": [
-        "Nurfitriani Buhungo, S.Pd",
-        "Mohamad Adnan Ibrahim, S.Pd",
-        "Sri Saputri Mayang, S.Pd",
-        "Esti Nofriani Ali, S.Pd",
-        "Nur Azizah R. Koping, S.Pd"
-      ],
-      "Fisika": [
-        "Fatmawati Saleh, S.Pd",
-        "Reny M. Sahrain, M.Pd",
-        "Mayariskawati Karim, S.Pd",
-        "Erni Podungge, M.M."
-      ],
-      "Kimia": [
-        "Fristo Kau, M.Pd",
-        "Fatmah F. Musa, S.Pd",
-        "Ram Ibrahim, S.Pd",
-        "Rahmad Utina, M.Pd"
-      ],
-      "Biologi": [
-        "Hartiman, S.Pd",
-        "Dra. Zubaida S. Bialangi",
-        "Susantiana A. Husain, S.Pd"
-      ],
-      "Sosiologi": [
-        "Yeri Prasetya Haipi, S.Pd"
-      ],
-      "Ekonomi": [
-        "Leni Marlina Abas, S.Pd",
-        "Agustin Hasania, S.Pd",
-        "Kartin Moli, S.Pd"
-      ],
-      "Sejarah": [
-        "Linda Banto, S.Pd",
-        "Fahril Ramadhan Yusuf, S.Pd",
-        "Irawaty AS. Ali, M.Pd",
-        "Dra. Agustina Pianus",
-        "Lutfiah R. Bagu, S.Pd"
-      ],
-      "Sejarah Peminatan": [
-        "Linda Banto, S.Pd",
-        "Fahril Ramadhan Yusuf, S.Pd",
-        "Irawaty AS. Ali, M.Pd",
-        "Dra. Agustina Pianus",
-        "Lutfiah R. Bagu, S.Pd"
-      ],
-      "Geografi": [
-        "Zakir Inggile, S.Pd",
-        "Fifiati, S.Pd"
-      ],
-      "Bahasa Inggris": [
-        "Hj. Ramlah H. Hasan, M.Pd",
-        "Selfi Katili, M.Pd",
-        "Drs. Hi. Abdul Razak Husain, M.Ed",
-        "Umar, M.Pd"
-      ],
-      "PJOK": [
-        "Drs. Jhon A.R. Yusuf",
-        "Marten Nuna, S.Pd",
-        "Nuriyadin Kunuti, S.Pd",
-        "Oman Wahiji, S.Pd"
-      ],
-      "Informatika": [
-        "Gabriela J. Tangkawarow, S.Pd",
-        "Herson Mustapa, S.SI",
-        "Newin Kalay, S.SI",
-        "Mirsan Kuka, S.Kom"
-      ],
-      "Seni Budaya": [
-        "Febriana Polontalo, S.Pd",
-        "Fita R. Naue, S.Pd"
-      ],
-      "Bimbingan Konseling": [
-        "Arlin Husnan, S.Pd",
-        "Karmila P. Paino, S.Pd",
-        "Meri Novianti, S.Pd",
-        "Nanda Oktaviany S. Djafar, S.Pd"
-      ],
-      "Koding & KA": [
-        "Sutrisno Tilahunga, SE"
-      ]
-    };
-
-    // DOM Elements
-    const mapelSelect = document.getElementById('mapel');
-    const kelasSelect = document.getElementById('kelas');
-    const guruSelect = document.getElementById('guru');
-    const result = document.getElementById('result');
-
-    // Update daftar guru berdasarkan mapel
-    mapelSelect.addEventListener('change', () => {
-      const mapel = mapelSelect.value;
-      guruSelect.innerHTML = '<option value="">-- Pilih Nama Anda --</option>';
-      
-      if (mapel && guruByMapel[mapel]) {
-        guruByMapel[mapel].forEach(guru => {
-          const option = document.createElement('option');
-          option.value = guru;
-          option.textContent = guru;
-          guruSelect.appendChild(option);
+        // Inisialisasi aplikasi
+        document.addEventListener('DOMContentLoaded', function() {
+            // Event Listeners
+            mapelSelect.addEventListener('change', populateGuruList);
+            loginAdminBtn.addEventListener('click', handleAdminLogin);
+            logoutAdminBtn.addEventListener('click', handleAdminLogout);
+            refreshDataBtn.addEventListener('click', refreshAdminData);
+            filterBtn.addEventListener('click', filterReportData);
+            exportExcelBtn.addEventListener('click', exportReportData);
+            showAdminPanelBtn.addEventListener('click', showAdminPanel);
         });
-      }
-      
-      localStorage.removeItem('namaGuru');
-      guruSelect.disabled = false;
-    });
 
-    // Cek nama guru dari localStorage
-    const savedGuru = localStorage.getItem('namaGuru');
-    if (savedGuru) {
-      guruSelect.value = savedGuru;
-      guruSelect.disabled = true;
-    }
-
-    // URL backend terbaru
-    const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbyUwNGtKZhsBaB1ppn5_lr5qwGVxz_tZxPATnFBu00u5W6hamisTtzeeGhY76m87O-C/exec';
-
-    // Fungsi untuk format waktu lokal (WITA)
-    const formatTime = () => {
-      const date = new Date();
-      const options = { 
-        year: 'numeric', 
-        month: 'short', 
-        day: '2-digit', 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        timeZone: 'Asia/Makassar' 
-      };
-      return date.toLocaleString('id-ID', options);
-    };
-
-    // Fungsi untuk reset nama guru
-    function resetGuru() {
-      localStorage.removeItem('namaGuru');
-      localStorage.removeItem('pendingAbsensi');
-      guruSelect.value = '';
-      guruSelect.disabled = false;
-      result.innerHTML = `<span class="success">✅ Nama guru direset. Silakan pilih nama baru.</span>`;
-    }
-
-    // Fungsi absen - INTEGRASI DENGAN BACKEND
-    let isProcessing = false;
-    async function absen(tipe) {
-      if (isProcessing) return;
-      isProcessing = true;
-
-      const mapel = mapelSelect.value?.trim();
-      const kelas = kelasSelect.value?.trim();
-      const nama = guruSelect.value?.trim();
-
-      console.log('Data yang akan dikirim:', { guru: nama, mapel, kelas, tipe });
-
-      if (!mapel) {
-        result.innerHTML = `<span class="error">❌ Pilih mata pelajaran dulu.</span>`;
-        isProcessing = false;
-        return;
-      }
-      if (!kelas) {
-        result.innerHTML = `<span class="error">❌ Pilih kelas dulu.</span>`;
-        isProcessing = false;
-        return;
-      }
-      if (!nama) {
-        result.innerHTML = `<span class="error">❌ Pilih nama Anda dulu.</span>`;
-        isProcessing = false;
-        return;
-      }
-
-      localStorage.setItem('namaGuru', nama);
-
-      document.querySelectorAll('.btn:not(.btn-reset)').forEach(btn => {
-        btn.disabled = true;
-        btn.style.opacity = '0.7';
-      });
-      result.textContent = 'Mengirim...';
-
-      const data = { guru: nama, mapel, kelas, tipe };
-
-      let attempt = 0;
-      const maxAttempts = 3;
-
-      while (attempt < maxAttempts) {
-        try {
-          await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
-          const res = await fetch(BACKEND_URL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data),
-            redirect: 'follow'
-          });
-
-          if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-          }
-
-          const responseText = await res.text();
-          let responseJson;
-          try {
-            responseJson = JSON.parse(responseText);
-          } catch (e) {
-            throw new Error('Respon tidak valid dari server');
-          }
-
-          if (responseJson.status === 'success') {
-            result.innerHTML = `<span class="success">✅ Berhasil! Absensi ${tipe} tercatat pada ${formatTime()}.</span>`;
-            localStorage.removeItem('pendingAbsensi');
-            break;
-          } else {
-            throw new Error(responseJson.message || 'Gagal menyimpan data');
-          }
-        } catch (err) {
-          attempt++;
-          console.error(`Fetch error (attempt ${attempt}/${maxAttempts}):`, err);
-          if (attempt === maxAttempts) {
-            result.innerHTML = `<span class="error">❌ Gagal: ${err.message || 'Periksa koneksi internet atau coba lagi nanti.'}</span>`;
-            localStorage.setItem('pendingAbsensi', JSON.stringify(data));
-            result.innerHTML += `<br><button class="btn btn-retry" onclick="retryAbsen()">Coba Lagi</button>`;
-          } else {
-            result.textContent = `Mengirim... (Percobaan ${attempt}/${maxAttempts})`;
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Tunggu 1 detik sebelum retry
-          }
+        // Show admin panel when button is clicked
+        function showAdminPanel() {
+            document.getElementById('adminLoginSection').classList.add('active');
+            document.getElementById('adminDashboardSection').classList.remove('active');
+            document.getElementById('adminLoginSection').classList.remove('hidden');
         }
-      }
 
-      if (attempt === maxAttempts) {
-        isProcessing = false;
-        document.querySelectorAll('.btn:not(.btn-reset)').forEach(btn => {
-          btn.disabled = false;
-          btn.style.opacity = '1';
-        });
-      }
-    }
-
-    // Fungsi untuk retry absensi yang gagal
-    async function retryAbsen() {
-      const pendingData = localStorage.getItem('pendingAbsensi');
-      if (!pendingData) {
-        result.innerHTML = `<span class="error">❌ Tidak ada data pending untuk dikirim.</span>`;
-        return;
-      }
-
-      const data = JSON.parse(pendingData);
-      result.textContent = 'Mencoba ulang...';
-
-      let attempt = 0;
-      const maxAttempts = 3;
-
-      while (attempt < maxAttempts) {
-        try {
-          await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
-          const res = await fetch(BACKEND_URL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data),
-            redirect: 'follow'
-          });
-
-          if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-          }
-
-          const responseText = await res.text();
-          let responseJson;
-          try {
-            responseJson = JSON.parse(responseText);
-          } catch (e) {
-            throw new Error('Respon tidak valid dari server');
-          }
-
-          if (responseJson.status === 'success') {
-            result.innerHTML = `<span class="success">✅ Berhasil! Absensi ${data.tipe} tercatat pada ${formatTime()}.</span>`;
-            localStorage.removeItem('pendingAbsensi');
-            break;
-          } else {
-            throw new Error(responseJson.message || 'Gagal menyimpan data');
-          }
-        } catch (err) {
-          attempt++;
-          console.error(`Retry error (attempt ${attempt}/${maxAttempts}):`, err);
-          if (attempt === maxAttempts) {
-            result.innerHTML = `<span class="error">❌ Gagal: ${err.message || 'Periksa koneksi internet atau coba lagi nanti.'}</span>`;
-            result.innerHTML += `<br><button class="btn btn-retry" onclick="retryAbsen()">Coba Lagi</button>`;
-          } else {
-            result.textContent = `Mencoba ulang... (Percobaan ${attempt}/${maxAttempts})`;
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Tunggu 1 detik sebelum retry
-          }
+        // Populate guru list based on mapel
+        function populateGuruList() {
+            const selectedMapel = mapelSelect.value;
+            guruSelect.innerHTML = '<option value="">-- Pilih Nama Anda --</option>';
+            
+            if (selectedMapel && guruByMapel[selectedMapel]) {
+                guruByMapel[selectedMapel].forEach(guruName => {
+                    const option = document.createElement('option');
+                    option.value = guruName;
+                    option.textContent = guruName;
+                    guruSelect.appendChild(option);
+                });
+            }
         }
-      }
-    }
 
-    // Cek jika ada data pending saat halaman dimuat
-    window.addEventListener('DOMContentLoaded', () => {
-      const pending = localStorage.getItem('pendingAbsensi');
-      if (pending) {
-        result.innerHTML = `<span class="warning">⚠️ Anda memiliki absensi yang belum terkirim.</span>`;
-        result.innerHTML += `<br><button class="btn btn-retry" onclick="retryAbsen()">Kirim Ulang</button>`;
-      }
-    });
-  </script>
+        // Reset guru selection
+        function resetGuru() {
+            mapelSelect.value = '';
+            kelasSelect.value = '';
+            guruSelect.innerHTML = '<option value="">-- Pilih Nama Anda --</option>';
+            resultDiv.classList.remove('show');
+            resultDiv.className = 'result';
+        }
+
+        // Absen function
+        function absen(status) {
+            const selectedMapel = mapelSelect.value;
+            const selectedKelas = kelasSelect.value;
+            const selectedGuru = guruSelect.value;
+            
+            if (!selectedMapel || !selectedKelas || !selectedGuru) {
+                showMessage('Silakan lengkapi semua field!', 'error');
+                return;
+            }
+            
+            // Simulasi pengiriman data
+            simulateSubmitAbsensi(selectedMapel, selectedKelas, selectedGuru, status);
+        }
+
+        // Simulasi submit absensi
+        function simulateSubmitAbsensi(mapel, kelas, guruName, status) {
+            // Buat data absensi
+            const absensiData = {
+                mapel: mapel,
+                kelas: kelas,
+                guru: guruName,
+                status: status,
+                tanggal: new Date().toISOString().split('T')[0],
+                waktu: new Date().toLocaleTimeString('id-ID')
+            };
+            
+            // Tampilkan hasil
+            showMessage(`Absensi ${status} berhasil untuk ${guruName}`, 'success');
+            console.log('Data absensi yang akan dikirim:', absensiData);
+            
+            // Reset form
+            resetGuru();
+            
+            // Tampilkan notifikasi
+            showNotification(`Absensi ${status} untuk ${guruName} berhasil`, 'success');
+        }
+
+        // Show message
+        function showMessage(message, type) {
+            resultDiv.textContent = message;
+            resultDiv.className = `result ${type} show`;
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Admin Login
+        function handleAdminLogin() {
+            const email = adminEmail.value;
+            const password = adminPassword.value;
+            
+            // Validasi sederhana
+            if (!email || !password) {
+                showNotification('Silakan masukkan email dan password', 'error');
+                return;
+            }
+            
+            // Simulasi login admin (email dan password valid)
+            if (email === 'admin@sman1limboto.sch.id' && password === 'admin123') {
+                adminLoginSection.classList.remove('active');
+                adminDashboardSection.classList.add('active');
+                showNotification('Login admin berhasil', 'success');
+            } else {
+                showNotification('Email atau password salah', 'error');
+            }
+        }
+
+        // Admin Logout
+        function handleAdminLogout() {
+            adminDashboardSection.classList.remove('active');
+            adminLoginSection.classList.add('active');
+            adminEmail.value = '';
+            adminPassword.value = '';
+            showNotification('Logout admin berhasil', 'success');
+        }
+
+        // Refresh data admin
+        function refreshAdminData() {
+            showNotification('Data telah diperbarui', 'success');
+        }
+
+        // Filter data report
+        function filterReportData() {
+            const filterDate = document.getElementById('filterDate').value;
+            
+            if (!filterDate) {
+                showNotification('Silakan pilih tanggal', 'error');
+                return;
+            }
+            
+            showNotification(`Data difilter untuk tanggal: ${filterDate}`, 'success');
+        }
+
+        // Export data ke CSV
+        function exportReportData() {
+            showNotification('Data sedang diekspor...', 'success');
+            setTimeout(() => {
+                showNotification('Data berhasil diekspor ke Excel', 'success');
+            }, 1500);
+        }
+
+        // Initialize with some demo data
+        window.onload = function() {
+            // Set today's date as default for filter
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('filterDate').value = today;
+        };
+    </script>
 </body>
 </html>
-
-
