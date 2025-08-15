@@ -1090,20 +1090,44 @@
 }
 
         // Show absensi page
-        function showAbsensiPage(user) {
-            // Set user info
-            userName.textContent = user.email.split('@')[0]; // Nama depan email
-            userEmail.textContent = user.email;
-            userAvatar.textContent = user.email.charAt(0).toUpperCase();
-            
-            // Hide login, show absensi
-            loginSection.style.display = 'none';
-            absensiSection.style.display = 'block';
-            
-            // Load data
-            loadMataPelajaran();
-            loadKelas();
+async function showAbsensiPage(user) {
+    try {
+        // Ambil data guru dari tabel `guru` berdasarkan auth_user_id
+        const {  guruData, error } = await supabase
+            .from('guru')
+            .select('id_guru, nama')
+            .eq('auth_user_id', user.id)
+            .single();
+
+        if (error || !guruData) {
+            showMessage('Anda belum terdaftar sebagai guru', 'error');
+            await supabase.auth.signOut();
+            loginSection.style.display = 'block';
+            absensiSection.style.display = 'none';
+            return;
         }
+
+        // Simpan di global agar bisa dipakai saat absen
+        window.currentGuru = guruData;
+
+        // Tampilkan info guru
+        userName.textContent = guruData.nama;
+        userEmail.textContent = user.email;
+        userAvatar.textContent = guruData.nama.charAt(0).toUpperCase();
+
+        // Sembunyikan login, tampilkan absensi
+        loginSection.style.display = 'none';
+        absensiSection.style.display = 'block';
+
+        // Muat data dropdown
+        loadMataPelajaran();
+        loadKelas();
+
+    } catch (err) {
+        showMessage('Gagal memuat data guru: ' + err.message, 'error');
+        console.error('Error di showAbsensiPage:', err);
+    }
+}
 
         // Reset guru selection
         function resetGuru() {
@@ -1314,5 +1338,6 @@
     </script>
 </body>
 </html>
+
 
 
