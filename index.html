@@ -1193,7 +1193,7 @@ async function showAbsensiPage(user) {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        guru_id: userData.user.id,
+                        guru_id: window.currentGuru.id_guru,
                         mata_pelajaran_id: mapelData.id_mapel,
                         kelas_id: kelasData.id_kelas,
                         status: status,
@@ -1338,6 +1338,7 @@ async function showAbsensiPage(user) {
     </script>
 </body>
 </html>
+
 
 
 
