@@ -2,12 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Sistem Absensi Guru SMA Negeri 1 Limboto</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
     <style>
-        /* CSS yang sama seperti sebelumnya */
         :root {
             --primary: #2563eb;
             --primary-dark: #1d4ed8;
@@ -25,24 +24,21 @@
             --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             --gradient-success: linear-gradient(135deg, var(--success) 0%, #059669 100%);
         }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
         }
-
         body {
             background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             color: var(--dark);
             line-height: 1.6;
             min-height: 100vh;
-            padding: 20px;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
             position: relative;
             overflow-x: hidden;
         }
-
         body::before {
             content: "";
             position: absolute;
@@ -55,15 +51,14 @@
                 radial-gradient(circle at 90% 80%, rgba(124, 58, 237, 0.05) 0%, transparent 20%);
             z-index: -1;
         }
-
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 0 15px;
         }
-
         header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             padding: 40px;
             background: var(--gradient-primary);
             color: white;
@@ -74,67 +69,63 @@
             transform: translateY(0);
             transition: var(--transition);
         }
-
-        header:hover {
-            transform: translateY(-5px);
-        }
-
-        header::before {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
-            transform: rotate(30deg);
-        }
-
         header h1 {
-            font-size: 2.8rem;
-            margin-bottom: 15px;
-            position: relative;
-            z-index: 2;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            margin-bottom: 8px;
             font-weight: 800;
         }
-
         header p {
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 3vw, 1.2rem);
             opacity: 0.9;
-            position: relative;
-            z-index: 2;
-            max-width: 600px;
-            margin: 0 auto;
+            margin: 0;
         }
-
         .logo-container {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 20px;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 2;
+            margin-bottom: 15px;
         }
-
         .logo {
             font-size: 3rem;
             color: white;
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0 30px;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--border-radius);
+            padding: 18px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+        .stat-number {
+            font-size: clamp(1.6rem, 4vw, 2rem);
+            font-weight: 700;
+            margin: 8px 0;
+        }
+        .stat-label {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
         .main-content {
             display: grid;
             grid-template-columns: 1fr;
             gap: 30px;
         }
-
         @media (min-width: 992px) {
             .main-content {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr;
             }
         }
-
         .card {
             background: white;
             border-radius: var(--border-radius);
@@ -143,14 +134,12 @@
             transition: var(--transition);
             border: 1px solid var(--light-gray);
         }
-
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
         }
-
         .card-title {
-            font-size: 1.6rem;
+            font-size: clamp(1.4rem, 3.5vw, 1.6rem);
             color: var(--primary);
             margin-bottom: 25px;
             padding-bottom: 15px;
@@ -160,7 +149,6 @@
             gap: 12px;
             font-weight: 700;
         }
-
         .card-title i {
             color: var(--secondary);
             background: rgba(37, 99, 235, 0.1);
@@ -171,11 +159,9 @@
             align-items: center;
             justify-content: center;
         }
-
         .form-group {
             margin-bottom: 25px;
         }
-
         .form-group label {
             display: block;
             margin-bottom: 10px;
@@ -185,7 +171,6 @@
             align-items: center;
             gap: 8px;
         }
-
         .form-control {
             width: 100%;
             padding: 16px;
@@ -196,27 +181,24 @@
             background: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
         }
-
         .btn-group {
             display: flex;
             gap: 20px;
             margin: 30px 0;
             flex-wrap: wrap;
         }
-
         .btn {
             flex: 1;
             min-width: 140px;
-            padding: 16px 20px;
+            padding: 14px 16px;
             border: none;
             border-radius: var(--border-radius);
-            font-size: 1.1rem;
+            font-size: clamp(1rem, 3vw, 1.1rem);
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
@@ -226,58 +208,35 @@
             gap: 10px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-
         .btn-masuk {
             background: var(--gradient-success);
             color: white;
             border: none;
         }
-
         .btn-masuk:hover {
             background: linear-gradient(135deg, #059669 0%, #047857 100%);
             transform: translateY(-3px);
             box-shadow: 0 8px 15px rgba(16, 185, 129, 0.3);
         }
-
         .btn-keluar {
             background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
             color: white;
             border: none;
         }
-
         .btn-keluar:hover {
             background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
             transform: translateY(-3px);
             box-shadow: 0 8px 15px rgba(249, 115, 22, 0.3);
         }
-
         .btn-reset {
             background: var(--light-gray);
             color: var(--dark);
             border: 1px solid var(--gray);
         }
-
         .btn-reset:hover {
             background: #d1d1d1;
             transform: translateY(-2px);
         }
-
-        .btn-admin {
-            background: var(--gradient-primary);
-            color: white;
-            padding: 14px 25px;
-            font-size: 1.1rem;
-            margin-top: 20px;
-            width: 100%;
-            border: none;
-        }
-
-        .btn-admin:hover {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, #6d28d9 100%);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(37, 99, 235, 0.3);
-        }
-
         .result {
             margin-top: 20px;
             padding: 15px;
@@ -287,42 +246,34 @@
             display: none;
             animation: fadeIn 0.5s ease;
         }
-
         .result.show {
             display: block;
         }
-
         .success {
             background: rgba(16, 185, 129, 0.15);
             color: #047857;
             border: 1px solid rgba(16, 185, 129, 0.3);
         }
-
         .error {
             background: rgba(239, 68, 68, 0.15);
             color: #dc2626;
             border: 1px solid rgba(239, 68, 68, 0.3);
         }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         .admin-section {
             display: none;
         }
-
         .admin-section.active {
             display: block;
             animation: slideIn 0.5s ease;
         }
-
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         .admin-header {
             display: flex;
             justify-content: space-between;
@@ -331,25 +282,21 @@
             padding-bottom: 15px;
             border-bottom: 2px solid var(--light-gray);
         }
-
         .admin-controls {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
         }
-
         .filter-controls {
             display: flex;
             gap: 15px;
             margin: 25px 0;
             flex-wrap: wrap;
         }
-
         .filter-controls input {
             flex: 1;
             min-width: 200px;
         }
-
         .report-item {
             background: var(--light);
             border-radius: var(--border-radius);
@@ -362,30 +309,25 @@
             transition: var(--transition);
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-
         .report-item:hover {
             transform: translateX(5px);
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
         }
-
         .report-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
         .guru-name {
             font-weight: 700;
             font-size: 1.3rem;
             color: var(--dark);
         }
-
         .class-subject {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
         }
-
         .guru-nip {
             background: var(--light-gray);
             padding: 5px 15px;
@@ -393,7 +335,6 @@
             font-size: 0.9rem;
             font-weight: 500;
         }
-
         .status {
             padding: 8px 20px;
             border-radius: 25px;
@@ -401,27 +342,22 @@
             font-size: 0.95rem;
             display: inline-block;
         }
-
         .status.hadir {
             background: rgba(16, 185, 129, 0.2);
             color: #047857;
         }
-
         .status.izin {
             background: rgba(245, 158, 11, 0.2);
             color: #92400e;
         }
-
         .status.sakit {
             background: rgba(239, 68, 68, 0.2);
             color: #dc2626;
         }
-
         .status.alfa {
             background: rgba(107, 114, 128, 0.2);
             color: #374151;
         }
-
         .date {
             color: var(--gray);
             font-size: 0.95rem;
@@ -429,7 +365,6 @@
             align-items: center;
             gap: 5px;
         }
-
         .footer {
             text-align: center;
             margin-top: 40px;
@@ -438,7 +373,6 @@
             font-size: 1rem;
             border-top: 1px solid var(--light-gray);
         }
-
         .notification {
             position: fixed;
             top: 20px;
@@ -455,206 +389,19 @@
             align-items: center;
             gap: 10px;
         }
-
         .notification.show {
             transform: translateX(0);
         }
-
         .notification.success {
             background: var(--gradient-success);
         }
-
         .notification.error {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         }
-
-        /* Tombol admin di header */
-        .admin-button-container {
-            text-align: center;
-            margin-top: 25px;
-        }
-
-        .admin-button {
-            background: var(--gradient-primary);
-            color: white;
-            padding: 14px 30px;
-            border: none;
-            border-radius: var(--border-radius);
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .admin-button:hover {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, #6d28d9 100%);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(37, 99, 235, 0.3);
-        }
-
-        /* Spasi tambahan untuk elemen form */
-        .guru-section {
-            margin-top: 20px;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            
-            header h1 {
-                font-size: 2.2rem;
-            }
-            
-            header p {
-                font-size: 1rem;
-            }
-            
-            .card {
-                padding: 25px;
-            }
-            
-            .btn-group {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-                padding: 14px;
-            }
-            
-            .filter-controls {
-                flex-direction: column;
-            }
-            
-            .filter-controls input {
-                width: 100%;
-            }
-            
-            .admin-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            
-            .admin-controls {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .report-item {
-                padding: 20px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            header h1 {
-                font-size: 1.8rem;
-            }
-            
-            .card-title {
-                font-size: 1.4rem;
-            }
-            
-            .btn {
-                padding: 14px;
-                font-size: 1rem;
-            }
-            
-            .logo {
-                font-size: 2.5rem;
-            }
-        }
-
-        /* Loading Animation */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* User Info Display */
-        .user-info {
-            background: var(--light-gray);
-            padding: 15px;
-            border-radius: var(--border-radius);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--gradient-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .user-details h3 {
-            margin: 0;
-            font-size: 1.1rem;
-        }
-
-        .user-details p {
-            margin: 0;
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-
-        /* Stats Cards */
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin: 25px 0;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: var(--border-radius);
-            padding: 20px;
-            text-align: center;
-            box-shadow: var(--box-shadow);
-            border: 1px solid var(--light-gray);
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin: 10px 0;
-        }
-
-        .stat-label {
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-
-        /* Floating Action Button */
         .floating-btn {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: calc(20px + env(safe-area-inset-bottom));
+            right: calc(20px + env(safe-area-inset-right));
             width: 60px;
             height: 60px;
             border-radius: 50%;
@@ -670,65 +417,47 @@
             z-index: 100;
             transition: var(--transition);
         }
-
         .floating-btn:hover {
             transform: scale(1.1) rotate(90deg);
             box-shadow: 0 12px 30px rgba(37, 99, 235, 0.6);
-        }
-
-        /* Animations */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .pulse {
-            animation: pulse 2s infinite;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Header Utama -->
         <header>
             <div class="logo-container">
                 <i class="fas fa-graduation-cap logo"></i>
                 <h1>Sistem Absensi Guru</h1>
             </div>
             <p>SMA Negeri 1 Limboto - Sistem Absensi Otomatis</p>
-            
-            <!-- Tombol Admin di Header -->
-            <div class="admin-button-container">
-                <button class="admin-button" id="showAdminPanel">
-                    <i class="fas fa-user-shield"></i> Admin Panel
-                </button>
+
+            <!-- 4 Box Statistik Dinamis -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-number guru-aktif">0</div>
+                    <div class="stat-label">Guru Aktif</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number absensi-hari-ini">0</div>
+                    <div class="stat-label">Absensi Hari Ini</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number kehadiran">0%</div>
+                    <div class="stat-label">Kehadiran</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number mapel-terdaftar">0</div>
+                    <div class="stat-label">Mapel Terdaftar</div>
+                </div>
             </div>
         </header>
 
-        <div class="stats-container">
-            <div class="stat-card">
-                <div class="stat-number">24</div>
-                <div class="stat-label">Guru Aktif</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">156</div>
-                <div class="stat-label">Absensi Hari Ini</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">98%</div>
-                <div class="stat-label">Kehadiran</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">12</div>
-                <div class="stat-label">Mapel Terdaftar</div>
-            </div>
-        </div>
-
         <div class="main-content">
-            <!-- Form Absensi -->
+            <!-- Form Login Guru -->
             <div class="card">
                 <h2 class="card-title"><i class="fas fa-user-check"></i> Form Absensi Guru</h2>
-                
                 <div id="login-section">
                     <div class="form-group">
                         <label for="guruEmail"><i class="fas fa-envelope"></i> Email Guru:</label>
@@ -743,7 +472,6 @@
                     </button>
                     <div id="login-result" class="result"></div>
                 </div>
-
                 <div id="absensi-section" style="display:none;">
                     <div class="user-info">
                         <div class="user-avatar" id="user-avatar">G</div>
@@ -752,55 +480,48 @@
                             <p id="user-email">guru@sman1limboto.sch.id</p>
                         </div>
                     </div>
-
                     <div class="form-group">
                         <label for="mapel"><i class="fas fa-book"></i> Mata Pelajaran:</label>
-                        <select id="mapel" class="form-control" aria-label="Pilih mata pelajaran">
+                        <select id="mapel" class="form-control">
                             <option value="">-- Pilih Mata Pelajaran --</option>
                         </select>
                     </div>
-
                     <div class="form-group">
                         <label for="kelas"><i class="fas fa-school"></i> Kelas:</label>
-                        <select id="kelas" class="form-control" aria-label="Pilih kelas">
+                        <select id="kelas" class="form-control">
                             <option value="">-- Pilih Kelas --</option>
                         </select>
                     </div>
-
                     <div class="btn-group">
-                        <button class="btn btn-masuk" onclick="absen('hadir')" aria-label="Absen masuk">
+                        <button class="btn btn-masuk" onclick="absen('hadir')">
                             <i class="fas fa-sign-in-alt"></i> Masuk
                         </button>
-                        <button class="btn btn-keluar" onclick="absen('izin')" aria-label="Absen keluar">
+                        <button class="btn btn-keluar" onclick="absen('izin')">
                             <i class="fas fa-sign-out-alt"></i> Izin/Sakit
                         </button>
                     </div>
-
                     <div id="result" class="result"></div>
                 </div>
             </div>
 
-            <!-- Admin Panel -->
+            <!-- Form Login & Panel Admin -->
             <div class="card">
-                <h2 class="card-title"><i class="fas fa-user-shield"></i> Admin Panel</h2>
-                
-                <div class="admin-section" id="adminLoginSection">
+                <h2 class="card-title"><i class="fas fa-user-shield"></i> Login Admin</h2>
+                <div id="adminLoginSection">
                     <div class="form-group">
                         <label for="adminEmail"><i class="fas fa-envelope"></i> Email Admin:</label>
                         <input type="email" id="adminEmail" class="form-control" placeholder="Masukkan email admin">
                     </div>
-                    
                     <div class="form-group">
                         <label for="adminPassword"><i class="fas fa-lock"></i> Password:</label>
                         <input type="password" id="adminPassword" class="form-control" placeholder="Masukkan password">
                     </div>
-                    
                     <button id="loginAdmin" class="btn btn-admin">
                         <i class="fas fa-sign-in-alt"></i> Login Admin
                     </button>
                 </div>
-                
-                <div class="admin-section active" id="adminDashboardSection">
+
+                <div id="adminDashboardSection" style="display:none;">
                     <div class="admin-header">
                         <h3>Laporan Absensi</h3>
                         <div class="admin-controls">
@@ -812,42 +533,15 @@
                             </button>
                         </div>
                     </div>
-                    
                     <div class="filter-controls">
                         <input type="date" id="filterDate" class="form-control">
                         <button id="filterBtn" class="btn btn-reset">
                             <i class="fas fa-filter"></i> Filter
                         </button>
                     </div>
-                    
                     <div id="reportData">
-                        <div class="report-item">
-                            <div class="report-header">
-                                <div class="guru-name">Sasmawati D. Halid, S.Ag</div>
-                                <div class="status hadir">Hadir</div>
-                            </div>
-                            <div class="class-subject">
-                                <div class="guru-nip">NIP: 19870123456789012345</div>
-                                <div class="guru-nip">Kelas: 10-1</div>
-                                <div class="guru-nip">Mapel: PAI dan BP</div>
-                            </div>
-                            <div class="date"><i class="far fa-clock"></i> Tanggal: 2025-01-15 | Waktu: 08:30:00</div>
-                        </div>
-                        
-                        <div class="report-item">
-                            <div class="report-header">
-                                <div class="guru-name">Mustapa Dako, S.Pd</div>
-                                <div class="status hadir">Hadir</div>
-                            </div>
-                            <div class="class-subject">
-                                <div class="guru-nip">NIP: 19870123456789012346</div>
-                                <div class="guru-nip">Kelas: 11-2</div>
-                                <div class="guru-nip">Mapel: Bahasa Indonesia</div>
-                            </div>
-                            <div class="date"><i class="far fa-clock"></i> Tanggal: 2025-01-15 | Waktu: 08:35:00</div>
-                        </div>
+                        <!-- Data akan diisi oleh JavaScript -->
                     </div>
-                    
                     <button id="logoutAdmin" class="btn btn-reset" style="margin-top: 20px;">
                         <i class="fas fa-sign-out-alt"></i> Logout Admin
                     </button>
@@ -863,17 +557,17 @@
     <button class="floating-btn" id="helpBtn" title="Bantuan">
         <i class="fas fa-question-circle"></i>
     </button>
-
     <div id="notification" class="notification"></div>
 
     <script>
-        // Konfigurasi Supabase - SUDAH DISISIPKAN
+        // Konfigurasi Supabase
         const SUPABASE_URL = 'https://leliqqnscujflgnsdtaz.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlbGlxcW5zY3VqZmxnbnNkdGF6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUyNTMwMTcsImV4cCI6MjA3MDgyOTAxN30.DCwFkHn6z2wfn7u14RDQJ4UCnrVsoON6pk8S8kQm6YY';
-        
+
         // Inisialisasi Supabase client
-        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
+        const { createClient } = supabase;
+        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         // DOM Elements
         const mapelSelect = document.getElementById('mapel');
         const kelasSelect = document.getElementById('kelas');
@@ -888,65 +582,45 @@
         const adminLoginSection = document.getElementById('adminLoginSection');
         const adminDashboardSection = document.getElementById('adminDashboardSection');
         const notification = document.getElementById('notification');
-        const showAdminPanelBtn = document.getElementById('showAdminPanel');
         const loginGuruBtn = document.getElementById('loginGuru');
         const loginSection = document.getElementById('login-section');
         const absensiSection = document.getElementById('absensi-section');
-        const loginResult = document.getElementById('login-result');
         const guruEmail = document.getElementById('guruEmail');
         const guruPassword = document.getElementById('guruPassword');
         const userName = document.getElementById('user-name');
         const userEmail = document.getElementById('user-email');
         const userAvatar = document.getElementById('user-avatar');
         const helpBtn = document.getElementById('helpBtn');
+        const reportData = document.getElementById('reportData');
 
         // Inisialisasi aplikasi
         document.addEventListener('DOMContentLoaded', function() {
-            // Load data awal
+            console.log('Aplikasi dimulai');
             loadMataPelajaran();
             loadKelas();
-
-            // Event Listeners
-            mapelSelect.addEventListener('change', populateGuruList);
+            loadStats(); // Muat statistik
+            loginGuruBtn.addEventListener('click', loginGuru);
             loginAdminBtn.addEventListener('click', handleAdminLogin);
             logoutAdminBtn.addEventListener('click', handleAdminLogout);
             refreshDataBtn.addEventListener('click', refreshAdminData);
             filterBtn.addEventListener('click', filterReportData);
             exportExcelBtn.addEventListener('click', exportReportData);
-            showAdminPanelBtn.addEventListener('click', showAdminPanel);
-            loginGuruBtn.addEventListener('click', loginGuru);
             helpBtn.addEventListener('click', showHelp);
-            
-            // Set default date
+
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('filterDate').value = today;
         });
 
-        // Show admin panel when button is clicked
-        function showAdminPanel() {
-            document.getElementById('adminLoginSection').classList.add('active');
-            document.getElementById('adminDashboardSection').classList.remove('active');
-            document.getElementById('adminLoginSection').classList.remove('hidden');
-        }
-
-        // Show help dialog
+        // Show help
         function showHelp() {
-            alert('Sistem Absensi Guru SMA Negeri 1 Limboto\n\n1. Login dengan akun guru\n2. Pilih mata pelajaran dan kelas\n3. Klik tombol Masuk/Izin\n4. Admin bisa melihat laporan di panel admin');
+            alert('Sistem Absensi Guru SMA Negeri 1 Limboto\n1. Login dengan akun guru\n2. Pilih mata pelajaran dan kelas\n3. Klik Masuk/Izin\n4. Admin bisa lihat laporan');
         }
 
-        // Ambil mata pelajaran dari Supabase
+        // Load mata pelajaran
         async function loadMataPelajaran() {
             try {
-                const { data, error } = await supabase
-                    .from('mata_pelajaran')
-                    .select('nama_mapel');
-                    
-                if (error) {
-                    console.error('Gagal ambil mata pelajaran:', error);
-                    showMessage('Gagal memuat mata pelajaran', 'error');
-                    return;
-                }
-
+                const { data, error } = await supabaseClient.from('mata_pelajaran').select('nama_mapel');
+                if (error) throw error;
                 mapelSelect.innerHTML = '<option value="">-- Pilih Mata Pelajaran --</option>';
                 data.forEach(mp => {
                     const opt = document.createElement('option');
@@ -954,25 +628,17 @@
                     opt.textContent = mp.nama_mapel;
                     mapelSelect.appendChild(opt);
                 });
-            } catch (error) {
-                console.error('Error loading mata pelajaran:', error);
-                showMessage('Error memuat mata pelajaran', 'error');
+            } catch (err) {
+                console.error('Error load mata pelajaran:', err);
+                showMessage('Gagal muat mata pelajaran', 'error');
             }
         }
 
-        // Ambil kelas dari Supabase
+        // Load kelas
         async function loadKelas() {
             try {
-                const { data, error } = await supabase
-                    .from('kelas')
-                    .select('nama_kelas');
-                    
-                if (error) {
-                    console.error('Gagal ambil kelas:', error);
-                    showMessage('Gagal memuat kelas', 'error');
-                    return;
-                }
-
+                const { data, error } = await supabaseClient.from('kelas').select('nama_kelas');
+                if (error) throw error;
                 kelasSelect.innerHTML = '<option value="">-- Pilih Kelas --</option>';
                 data.forEach(k => {
                     const opt = document.createElement('option');
@@ -980,274 +646,186 @@
                     opt.textContent = k.nama_kelas;
                     kelasSelect.appendChild(opt);
                 });
-            } catch (error) {
-                console.error('Error loading kelas:', error);
-                showMessage('Error memuat kelas', 'error');
+            } catch (err) {
+                console.error('Error load kelas:', err);
+                showMessage('Gagal muat kelas', 'error');
             }
         }
 
-        // Populate guru list based on mapel
-        async function populateGuruList() {
-            const selectedMapel = mapelSelect.value;
-            
-            // Bersihkan dropdown guru
-            const guruSelect = document.getElementById('guru-select');
-            if (guruSelect) {
-                guruSelect.innerHTML = '<option value="">-- Pilih Nama Anda --</option>';
-            }
-            
-            if (!selectedMapel) return;
-            
+        // Load statistik dari Supabase
+        async function loadStats() {
             try {
-                // Cari mata pelajaran ID
-                const {  mapelData, error: mapelError } = await supabase
-                    .from('mata_pelajaran')
-                    .select('id_mapel')
-                    .eq('nama_mapel', selectedMapel)
-                    .single();
-                    
-                if (mapelError || !mapelData) {
-                    console.error('Mata pelajaran tidak ditemukan:', mapelError);
-                    showMessage('Mata pelajaran tidak ditemukan', 'error');
-                    return;
+                const today = new Date().toISOString().split('T')[0];
+
+                // Guru Aktif
+                const { count: totalGuru } = await supabaseClient
+                    .from('guru')
+                    .select('id_guru', { count: 'exact' });
+                document.querySelector('.guru-aktif').textContent = totalGuru || 0;
+
+                // Absensi Hari Ini
+                const { count: absensiToday } = await supabaseClient
+                    .from('absensi_guru')
+                    .select('id_absensi_guru', { count: 'exact' })
+                    .eq('tanggal', today);
+                document.querySelector('.absensi-hari-ini').textContent = absensiToday || 0;
+
+                // Kehadiran (%)
+                const {   allAbsensi } = await supabaseClient
+                    .from('absensi_guru')
+                    .select('status');
+                if (allAbsensi.length > 0) {
+                    const hadirCount = allAbsensi.filter(a => a.status === 'hadir').length;
+                    const persentase = Math.round((hadirCount / allAbsensi.length) * 100);
+                    document.querySelector('.kehadiran').textContent = persentase + '%';
                 }
-                
-                // Ambil guru berdasarkan mata pelajaran ID
-                const {  guruData, error: guruError } = await supabase
+
+                // Mapel Terdaftar
+                const { count: totalMapel } = await supabaseClient
+                    .from('mata_pelajaran')
+                    .select('id_mapel', { count: 'exact' });
+                document.querySelector('.mapel-terdaftar').textContent = totalMapel || 0;
+
+            } catch (err) {
+                console.error('Gagal muat statistik:', err);
+            }
+        }
+
+        // Login Guru
+        async function loginGuru() {
+            const email = guruEmail.value;
+            const password = guruPassword.value;
+            if (!email || !password) {
+                showMessage('Email dan password wajib diisi', 'error');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+
+                const {  guruData, error: guruError } = await supabaseClient
                     .from('guru')
                     .select('id_guru, nama')
-                    .eq('mata_pelajaran_id', mapelData.id_mapel);
-                    
-                if (guruError) {
-                    console.error('Error mengambil guru:', guruError);
-                    showMessage('Gagal memuat guru', 'error');
+                    .eq('auth_user_id', data.user.id)
+                    .single();
+
+                if (guruError || !guruData) {
+                    showMessage('Anda belum terdaftar sebagai guru', 'error');
                     return;
                 }
-                
-                // Isi dropdown guru
-                guruData.forEach(guru => {
-                    const option = document.createElement('option');
-                    option.value = guru.id_guru;
-                    option.textContent = guru.nama;
-                    guruSelect.appendChild(option);
-                });
-                
-            } catch (error) {
-                console.error('Error populate guru:', error);
-                showMessage('Error memuat guru', 'error');
+
+                window.currentGuru = guruData;
+                showMessage('Login berhasil!', 'success');
+                showAbsensiPage(data.user);
+            } catch (err) {
+                console.error('Login gagal:', err);
+                showMessage('Login gagal: ' + err.message, 'error');
             }
         }
 
-        // Login guru
-        async function loginGuru() {
-          const email = guruEmail.value;
-          const password = guruPassword.value;
-
-          if (!email || !password) {
-            showMessage('Silakan masukkan email dan password', 'error');
-            return;
-          }
-
-          try {
-            // Coba login dulu
-            const { data, error } = await supabase.auth.signInWithPassword({
-              email,
-              password
-            });
-
-            if (error) {
-              // Jika login gagal, coba daftar (signup)
-              if (error.message.includes("Invalid login credentials")) {
-                const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-                  email,
-                  password,
-                  options: {
-                    data: {
-                      // Tambah metadata jika perlu
-                    }
-                  }
-                });
-
-                if (signUpError) {
-                  showMessage('Gagal daftar: ' + signUpError.message, 'error');
-                  return;
-                }
-
-                showMessage('Akun berhasil dibuat! Silakan login.', 'success');
-                return;
-              } else {
-                showMessage('Login gagal: ' + error.message, 'error');
-                return;
-       }
-     }
-
-    // Login berhasil
-    showMessage('Login berhasil!', 'success');
-    showAbsensiPage(data.user);
-  } catch (err) {
-    showMessage('Error: ' + err.message, 'error');
-  }
-}
-
-        // Show absensi page
-async function showAbsensiPage(user) {
-    try {
-        // Ambil data guru dari tabel `guru` berdasarkan auth_user_id
-        const {  guruData, error } = await supabase
-            .from('guru')
-            .select('id_guru, nama')
-            .eq('auth_user_id', user.id)
-            .single();
-
-        if (error || !guruData) {
-            showMessage('Anda belum terdaftar sebagai guru', 'error');
-            await supabase.auth.signOut();
-            loginSection.style.display = 'block';
-            absensiSection.style.display = 'none';
-            return;
+        // Tampilkan halaman absensi
+        function showAbsensiPage(user) {
+            userName.textContent = window.currentGuru.nama;
+            userEmail.textContent = user.email;
+            userAvatar.textContent = window.currentGuru.nama.charAt(0).toUpperCase();
+            loginSection.style.display = 'none';
+            absensiSection.style.display = 'block';
         }
 
-        // Simpan di global agar bisa dipakai saat absen
-        window.currentGuru = guruData;
-
-        // Tampilkan info guru
-        userName.textContent = guruData.nama;
-        userEmail.textContent = user.email;
-        userAvatar.textContent = guruData.nama.charAt(0).toUpperCase();
-
-        // Sembunyikan login, tampilkan absensi
-        loginSection.style.display = 'none';
-        absensiSection.style.display = 'block';
-
-        // Muat data dropdown
-        loadMataPelajaran();
-        loadKelas();
-
-    } catch (err) {
-        showMessage('Gagal memuat data guru: ' + err.message, 'error');
-        console.error('Error di showAbsensiPage:', err);
-    }
-}
-
-        // Reset guru selection
+        // Reset form
         function resetGuru() {
             mapelSelect.value = '';
             kelasSelect.value = '';
             resultDiv.classList.remove('show');
-            resultDiv.className = 'result';
         }
 
-        // Absen function
+        // Absen
         function absen(status) {
-            const selectedMapel = mapelSelect.value;
-            const selectedKelas = kelasSelect.value;
-            
-            if (!selectedMapel || !selectedKelas) {
-                showMessage('Silakan lengkapi semua field!', 'error');
+            const mapel = mapelSelect.value;
+            const kelas = kelasSelect.value;
+            if (!mapel || !kelas) {
+                showMessage('Lengkapi semua field!', 'error');
                 return;
             }
-            
-            // Kirim ke Supabase
-            submitAbsensiToSupabase(selectedMapel, selectedKelas, status);
+            submitAbsensiToSupabase(mapel, kelas, status);
         }
 
-        // Fungsi untuk mengirim absensi ke Supabase
+        // Kirim absensi
         async function submitAbsensiToSupabase(mapel, kelas, status) {
             try {
-                // Ambil ID mata pelajaran
-                const {  mapelData, error: mapelError } = await supabase
+                const {  mapelData } = await supabaseClient
                     .from('mata_pelajaran')
                     .select('id_mapel')
                     .eq('nama_mapel', mapel)
                     .single();
-                    
-                if (mapelError || !mapelData) {
-                    showMessage('Mata pelajaran tidak ditemukan!', 'error');
-                    return;
-                }
 
-                // Ambil ID kelas
-                const {  kelasData, error: kelasError } = await supabase
+                const {  kelasData } = await supabaseClient
                     .from('kelas')
                     .select('id_kelas')
                     .eq('nama_kelas', kelas)
                     .single();
-                    
-                if (kelasError || !kelasData) {
-                    showMessage('Kelas tidak ditemukan!', 'error');
+
+                if (!mapelData || !kelasData) {
+                    showMessage('Data tidak ditemukan!', 'error');
                     return;
                 }
 
-                // Ambil user yang sedang login
-                const {  userData, error: userError } = await supabase.auth.getUser();
-                
-                if (userError || !userData.user) {
+                const {  userData } = await supabaseClient.auth.getUser();
+                if (!userData.user) {
                     showMessage('Anda belum login!', 'error');
                     return;
                 }
 
-                // Kirim ke Edge Function
-                const response = await fetch('https://qjafjwdhasditvfqvnuy.functions.supabase.co/process-attendance', {
+                const response = await fetch('https://leliqqnscujflgnsdtaz.functions.supabase.co/process-attendance', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         guru_id: window.currentGuru.id_guru,
                         mata_pelajaran_id: mapelData.id_mapel,
                         kelas_id: kelasData.id_kelas,
-                        status: status,
+                        status,
                         lokasi_absen: 'SMA Negeri 1 Limboto'
                     })
                 });
 
                 const result = await response.json();
-
                 if (response.ok) {
                     showMessage(`Absensi berhasil: ${result.message}`, 'success');
-                    showNotification(`Absensi ${status} berhasil`, 'success');
+                    showNotification('Absensi berhasil', 'success');
                     resetGuru();
+                    loadStats(); // Perbarui statistik
                 } else {
                     throw new Error(result.error);
                 }
             } catch (err) {
                 showMessage('Gagal absen: ' + err.message, 'error');
-                console.error('Error submit absensi:', err);
+                console.error('Error:', err);
             }
         }
 
         // Show message
-        function showMessage(message, type) {
-            resultDiv.textContent = message;
+        function showMessage(msg, type) {
+            resultDiv.textContent = msg;
             resultDiv.className = `result ${type} show`;
         }
 
         // Show notification
-        function showNotification(message, type) {
-            notification.textContent = message;
+        function showNotification(msg, type) {
+            notification.textContent = msg;
             notification.className = `notification ${type} show`;
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
+            setTimeout(() => notification.classList.remove('show'), 3000);
         }
 
         // Admin Login
         function handleAdminLogin() {
             const email = adminEmail.value;
             const password = adminPassword.value;
-            
-            // Validasi sederhana
-            if (!email || !password) {
-                showNotification('Silakan masukkan email dan password', 'error');
-                return;
-            }
-            
-            // Simulasi login admin (email dan password valid)
             if (email === 'admin@sman1limboto.sch.id' && password === 'admin123') {
-                adminLoginSection.classList.remove('active');
-                adminDashboardSection.classList.add('active');
+                adminLoginSection.style.display = 'none';
+                adminDashboardSection.style.display = 'block';
                 showNotification('Login admin berhasil', 'success');
+                refreshAdminData();
             } else {
                 showNotification('Email atau password salah', 'error');
             }
@@ -1255,17 +833,17 @@ async function showAbsensiPage(user) {
 
         // Admin Logout
         function handleAdminLogout() {
-            adminDashboardSection.classList.remove('active');
-            adminLoginSection.classList.add('active');
+            adminDashboardSection.style.display = 'none';
+            adminLoginSection.style.display = 'block';
             adminEmail.value = '';
             adminPassword.value = '';
-            showNotification('Logout admin berhasil', 'success');
+            showNotification('Logout berhasil', 'success');
         }
 
         // Refresh data admin
         async function refreshAdminData() {
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('absensi_guru')
                     .select(`
                         tanggal,
@@ -1278,67 +856,44 @@ async function showAbsensiPage(user) {
                     .order('waktu_absen', { ascending: false })
                     .limit(50);
 
-                if (error) {
-                    showNotification('Gagal ambil data: ' + error.message, 'error');
-                    return;
-                }
+                if (error) throw error;
 
-                const reportDiv = document.getElementById('reportData');
-                reportDiv.innerHTML = '';
-
-                if (data.length === 0) {
-                    reportDiv.innerHTML = '<p>Tidak ada data absensi.</p>';
-                    return;
-                }
-
-                data.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'report-item';
-                    div.innerHTML = `
-                        <div class="report-header">
-                            <div class="guru-name">${item.guru.nama}</div>
-                            <div class="status ${item.status}">${item.status}</div>
+                reportData.innerHTML = data.length === 0 
+                    ? '<p>Tidak ada data.</p>' 
+                    : data.map(item => `
+                        <div class="report-item">
+                            <div class="report-header">
+                                <div class="guru-name">${item.guru.nama}</div>
+                                <div class="status ${item.status}">${item.status}</div>
+                            </div>
+                            <div class="class-subject">
+                                <div class="guru-nip">NIP: ${item.guru.nip}</div>
+                                <div class="guru-nip">Kelas: ${item.kelas.nama_kelas}</div>
+                                <div class="guru-nip">Mapel: ${item.mata_pelajaran.nama_mapel}</div>
+                            </div>
+                            <div class="date"><i class="far fa-clock"></i> ${item.tanggal} | ${item.waktu_absen}</div>
                         </div>
-                        <div class="class-subject">
-                            <div class="guru-nip">NIP: ${item.guru.nip}</div>
-                            <div class="guru-nip">Kelas: ${item.kelas.nama_kelas}</div>
-                            <div class="guru-nip">Mapel: ${item.mata_pelajaran.nama_mapel}</div>
-                        </div>
-                        <div class="date"><i class="far fa-clock"></i> Tanggal: ${item.tanggal} | Waktu: ${item.waktu_absen}</div>
-                    `;
-                    reportDiv.appendChild(div);
-                });
-
-                showNotification('Data berhasil dimuat', 'success');
-            } catch (error) {
-                console.error('Error refreshing admin data:', error);
-                showNotification('Gagal memuat data', 'error');
+                    `).join('');
+            } catch (err) {
+                showNotification('Gagal muat data: ' + err.message, 'error');
             }
         }
 
-        // Filter data report
+        // Filter data
         function filterReportData() {
-            const filterDate = document.getElementById('filterDate').value;
-            
-            if (!filterDate) {
-                showNotification('Silakan pilih tanggal', 'error');
+            const date = document.getElementById('filterDate').value;
+            if (!date) {
+                showNotification('Pilih tanggal', 'error');
                 return;
             }
-            
-            showNotification(`Data difilter untuk tanggal: ${filterDate}`, 'success');
+            showNotification(`Filter: ${date}`, 'success');
         }
 
-        // Export data ke CSV
+        // Export
         function exportReportData() {
-            showNotification('Data sedang diekspor...', 'success');
-            setTimeout(() => {
-                showNotification('Data berhasil diekspor ke Excel', 'success');
-            }, 1500);
+            showNotification('Sedang mengekspor...', 'success');
+            setTimeout(() => showNotification('Berhasil diekspor', 'success'), 1500);
         }
     </script>
 </body>
 </html>
-
-
-
-
