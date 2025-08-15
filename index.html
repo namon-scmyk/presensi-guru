@@ -1040,33 +1040,54 @@
 
         // Login guru
         async function loginGuru() {
-            const email = guruEmail.value;
-            const password = guruPassword.value;
-            
-            if (!email || !password) {
-                showMessage('Silakan masukkan email dan password', 'error');
-                return;
-            }
-            
-            try {
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password
+          const email = guruEmail.value;
+          const password = guruPassword.value;
+
+          if (!email || !password) {
+            showMessage('Silakan masukkan email dan password', 'error');
+            return;
+          }
+
+          try {
+            // Coba login dulu
+            const { data, error } = await supabase.auth.signInWithPassword({
+              email,
+              password
+            });
+
+            if (error) {
+              // Jika login gagal, coba daftar (signup)
+              if (error.message.includes("Invalid login credentials")) {
+                const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                  email,
+                  password,
+                  options: {
+                    data: {
+                      // Tambah metadata jika perlu
+                    }
+                  }
                 });
-                
-                if (error) {
-                    showMessage('Login gagal: ' + error.message, 'error');
-                    return;
+
+                if (signUpError) {
+                  showMessage('Gagal daftar: ' + signUpError.message, 'error');
+                  return;
                 }
-                
-                // Login berhasil
-                showMessage('Login berhasil!', 'success');
-                showAbsensiPage(data.user);
-                
-            } catch (err) {
-                showMessage('Error: ' + err.message, 'error');
-            }
-        }
+
+                showMessage('Akun berhasil dibuat! Silakan login.', 'success');
+                return;
+              } else {
+                showMessage('Login gagal: ' + error.message, 'error');
+                return;
+       }
+     }
+
+    // Login berhasil
+    showMessage('Login berhasil!', 'success');
+    showAbsensiPage(data.user);
+  } catch (err) {
+    showMessage('Error: ' + err.message, 'error');
+  }
+}
 
         // Show absensi page
         function showAbsensiPage(user) {
@@ -1293,4 +1314,5 @@
     </script>
 </body>
 </html>
+
 
