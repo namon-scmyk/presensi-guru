@@ -897,7 +897,7 @@
                     showMessage('Data tidak valid', 'error');
                     return;
                 }
-                const response = await fetch('https://leliqqnscujflgnsdtaz.functions.supabase.co/process-attendance', {
+                const response = await fetch('https://rqyfgxvfkzuqngvjhkrm.supabase.co/functions/v1/process-attendance', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${supabaseClient.auth.session()?.access_token}`,
@@ -1104,6 +1104,7 @@
     </script>
 </body>
 </html>
+
 
 
 
