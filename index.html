@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Sistem Absensi Guru SMA Negeri 1 Limboto</title>
-    <!-- manifest.json dihapus sementara karena tidak tersedia -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -541,7 +540,6 @@
                 </div>
             </div>
         </header>
-
         <div class="main-content">
             <div class="card">
                 <h2 class="card-title"><i class="fas fa-user-check"></i> Form Absensi Guru</h2>
@@ -596,7 +594,6 @@
                     <div id="result" class="result"></div>
                 </div>
             </div>
-
             <div class="card">
                 <h2 class="card-title"><i class="fas fa-user-shield"></i> Login Admin</h2>
                 <div id="adminLoginSection">
@@ -612,7 +609,6 @@
                         <i class="fas fa-sign-in-alt"></i> Login Admin
                     </button>
                 </div>
-
                 <div id="adminDashboardSection" class="hidden">
                     <div class="admin-header">
                         <h3>Laporan Absensi</h3>
@@ -638,24 +634,20 @@
                 </div>
             </div>
         </div>
-
         <div class="footer">
             <p id="footer-text"></p>
         </div>
     </div>
-
     <button class="floating-btn" id="helpBtn" title="Bantuan" aria-label="Bantuan Sistem">
         <i class="fas fa-question-circle"></i>
     </button>
     <div id="notification" class="notification"></div>
-
     <script>
         // Inisialisasi Supabase
         const supabaseClient = supabase.createClient(
             'https://rqyfgxvfkzuqngvjhkrm.supabase.co',
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxeWZneHZma3p1cW5ndmpoa3JtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0MTU3NjQsImV4cCI6MjA3MDk5MTc2NH0.Beq3Z4EL7TMx59BYK6XERmCel_MQnIA7Jx__3_AwLVU'
         );
-
         // DOM Elements
         const mapelSelect = document.getElementById('mapel');
         const kelasSelect = document.getElementById('kelas');
@@ -681,7 +673,6 @@
         const helpBtn = document.getElementById('helpBtn');
         const reportData = document.getElementById('reportData');
         const footerText = document.getElementById('footer-text');
-
         // Inisialisasi aplikasi
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Aplikasi dimulai');
@@ -690,7 +681,7 @@
             document.getElementById('filterDate').value = today;
             await loadMataPelajaran();
             await loadKelas();
-            await loadStats();
+            await loadStats(); // Statistik dimuat tanpa notifikasi error
             loginGuruBtn.addEventListener('click', loginGuru);
             loginAdminBtn.addEventListener('click', handleAdminLogin);
             logoutAdminBtn.addEventListener('click', handleAdminLogout);
@@ -700,7 +691,6 @@
             helpBtn.addEventListener('click', showHelp);
             await checkUserSession();
         });
-
         // Cek sesi pengguna
         async function checkUserSession() {
             const { data: { user } } = await supabaseClient.auth.getUser();
@@ -720,7 +710,6 @@
                 }
             }
         }
-
         // Cek koneksi internet
         function checkOnlineStatus() {
             if (!navigator.onLine) {
@@ -729,7 +718,6 @@
             }
             return true;
         }
-
         // Show help
         function showHelp() {
             alert(`Sistem Absensi Guru SMA Negeri 1 Limboto
@@ -738,7 +726,6 @@
 3. Klik Masuk untuk memulai mengajar, Keluar untuk selesai, atau Izin/Sakit jika tidak hadir
 4. Admin bisa lihat laporan`);
         }
-
         // Load mata pelajaran
         async function loadMataPelajaran() {
             try {
@@ -758,7 +745,6 @@
                 showNotification('Gagal memuat mata pelajaran: ' + err.message, 'error');
             }
         }
-
         // Load kelas
         async function loadKelas() {
             try {
@@ -778,8 +764,7 @@
                 showNotification('Gagal memuat kelas: ' + err.message, 'error');
             }
         }
-
-        // Load statistik
+        // Load statistik (tanpa notifikasi error saat inisialisasi)
         async function loadStats() {
             try {
                 const today = new Date().toISOString().split('T')[0];
@@ -797,19 +782,19 @@
                     .from('absensi_guru')
                     .select('status')
                     .eq('tanggal', today);
-                const totalAbsensi = kehadiranData.length;
-                const hadirCount = kehadiranData.filter(item => item.status === 'hadir').length;
+
+                const totalAbsensi = kehadiranData?.length || 0;
+                const hadirCount = kehadiranData?.filter(item => item.status === 'hadir').length || 0;
                 const kehadiranPersen = totalAbsensi > 0 ? Math.round((hadirCount / totalAbsensi) * 100) : 0;
-                document.querySelector('.guru-aktif').textContent = guruCount.length;
-                document.querySelector('.absensi-hari-ini').textContent = absensiToday.length;
+
+                document.querySelector('.guru-aktif').textContent = guruCount?.length || 0;
+                document.querySelector('.absensi-hari-ini').textContent = absensiToday?.length || 0;
                 document.querySelector('.kehadiran').textContent = `${kehadiranPersen}%`;
-                document.querySelector('.mapel-terdaftar').textContent = mapelCount.length;
+                document.querySelector('.mapel-terdaftar').textContent = mapelCount?.length || 0;
             } catch (err) {
-                // Hanya log ke konsol, jangan tampilkan notifikasi
-                console.warn(''Statistik gagal dimuat saat inisialisasi:', err.message');
+                console.warn(`Statistik gagal dimuat saat inisialisasi: ${err.message}`);
             }
         }
-
         // Login Guru
         async function loginGuru() {
             if (!checkOnlineStatus()) return;
@@ -839,7 +824,6 @@
                 showMessage('Login gagal: ' + err.message, 'error');
             }
         }
-
         // Tampilkan halaman absensi
         function showAbsensiPage(user) {
             userName.textContent = window.currentGuru.nama;
@@ -848,7 +832,6 @@
             loginSection.classList.add('hidden');
             absensiSection.classList.remove('hidden');
         }
-
         // Logout Guru
         async function logoutGuru() {
             try {
@@ -864,14 +847,12 @@
                 showNotification('Gagal logout: ' + err.message, 'error');
             }
         }
-
         // Reset form
         function resetGuru() {
             mapelSelect.value = '';
             kelasSelect.value = '';
             resultDiv.classList.remove('show');
         }
-
         // Absen
         async function absen(status) {
             if (!checkOnlineStatus()) return;
@@ -922,20 +903,17 @@
                 showMessage('Gagal absen: ' + err.message, 'error');
             }
         }
-
         // Show message
         function showMessage(msg, type) {
             resultDiv.textContent = msg;
             resultDiv.className = `result ${type} show`;
         }
-
         // Show notification
         function showNotification(msg, type) {
             notification.innerHTML = `${msg} <button onclick="this.parentElement.classList.remove('show')" style="background:none;border:none;color:white;cursor:pointer;">✕</button>`;
             notification.className = `notification ${type} show`;
             setTimeout(() => notification.classList.remove('show'), 5000);
         }
-
         // Admin Login
         async function handleAdminLogin() {
             if (!checkOnlineStatus()) return;
@@ -965,7 +943,6 @@
                 showNotification('Login gagal: ' + err.message, 'error');
             }
         }
-
         // Admin Logout
         async function handleAdminLogout() {
             try {
@@ -980,7 +957,6 @@
                 showNotification('Gagal logout: ' + err.message, 'error');
             }
         }
-
         // Refresh data admin
         async function refreshAdminData() {
             try {
@@ -1017,7 +993,6 @@
                 showNotification('Gagal muat data: ' + err.message, 'error');
             }
         }
-
         // Filter data
         async function filterReportData() {
             const date = document.getElementById('filterDate').value;
@@ -1061,7 +1036,6 @@
                 showNotification('Gagal memuat data: ' + err.message, 'error');
             }
         }
-
         // Export data ke Excel
         async function exportReportData() {
             try {
@@ -1104,9 +1078,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
