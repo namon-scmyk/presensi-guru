@@ -801,7 +801,8 @@
                 document.querySelector('.kehadiran').textContent = `${kehadiranPersen}%`;
                 document.querySelector('.mapel-terdaftar').textContent = mapelCount.length;
             } catch (err) {
-                showNotification('Gagal memuat statistik: ' + err.message, 'error');
+                // Hanya log ke konsol, jangan tampilkan notifikasi
+                console.warn(''Statistik gagal dimuat saat inisialisasi:', err.message');
             }
         }
 
@@ -1099,4 +1100,5 @@
     </script>
 </body>
 </html>
+
 
