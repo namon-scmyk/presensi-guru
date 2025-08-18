@@ -3,21 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Sistem Absensi Guru SMA Negeri 1 Limboto</title>
+    <title>Sistem Manajemen Kinerja Guru</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <noscript>
-        <style>
-            body { display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; }
-            .container { display: none; }
-        </style>
-        <p>Aplikasi ini memerlukan JavaScript untuk berfungsi. Silakan aktifkan JavaScript di browser Anda.</p>
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; background: #fff; z-index: 9999;">
+            <p>Aplikasi ini memerlukan JavaScript untuk berfungsi. Silakan aktifkan JavaScript di browser Anda.</p>
+        </div>
     </noscript>
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
+            --primary: #1e40af;
+            --primary-dark: #1e3a8a;
             --secondary: #7c3aed;
             --success: #10b981;
             --warning: #f59e0b;
@@ -57,7 +55,7 @@
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 10% 20%, rgba(30, 64, 175, 0.05) 0%, transparent 20%),
                 radial-gradient(circle at 90% 80%, rgba(124, 58, 237, 0.05) 0%, transparent 20%);
             z-index: -1;
         }
@@ -193,7 +191,7 @@
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+            box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.2);
         }
         .btn-group {
             display: flex;
@@ -237,6 +235,16 @@
             background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
             transform: translateY(-3px);
             box-shadow: 0 8px 15px rgba(249, 115, 22, 0.3);
+        }
+        .btn-sakit {
+            background: linear-gradient(135deg, var(--danger) 0%, #b91c1c 100%);
+            color: white;
+            border: none;
+        }
+        .btn-sakit:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(239, 68, 68, 0.3);
         }
         .btn-exit {
             background: var(--gradient-exit);
@@ -433,7 +441,7 @@
             background: var(--gradient-primary);
             color: white;
             border: none;
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+            box-shadow: 0 8px 25px rgba(30, 64, 175, 0.4);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -444,7 +452,7 @@
         }
         .floating-btn:hover {
             transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.6);
+            box-shadow: 0 12px 30px rgba(30, 64, 175, 0.6);
         }
         .hidden {
             display: none;
@@ -517,10 +525,10 @@
         <!-- Header Utama -->
         <header>
             <div class="logo-container">
-                <i class="fas fa-graduation-cap logo"></i>
-                <h1>Sistem Absensi Guru</h1>
+                <i class="fas fa-chart-line logo"></i>
+                <h1>Sistem Manajemen Kinerja Guru</h1>
             </div>
-            <p>SMA Negeri 1 Limboto - Sistem Absensi Otomatis</p>
+            <p>SMA Negeri 1 Limboto - Presensi Guru</p>
             <div class="stats-container">
                 <div class="stat-card">
                     <div class="stat-number guru-aktif">0</div>
@@ -559,10 +567,10 @@
                 </div>
                 <div id="absensi-section" class="hidden">
                     <div class="user-info">
-                        <div class="user-avatar" id="user-avatar"></div>
+                        <div class="user-avatar" id="user-avatar">?</div>
                         <div class="user-details">
-                            <h3 id="user-name"></h3>
-                            <p id="user-email"></p>
+                            <h3 id="user-name">Memuat...</h3>
+                            <p id="user-email">Memuat...</p>
                         </div>
                     </div>
                     <div class="form-group">
@@ -578,14 +586,17 @@
                         </select>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-masuk" onclick="absen('hadir')" aria-label="Absen Masuk">
-                            <i class="fas fa-sign-in-alt"></i> Masuk
+                        <button class="btn btn-masuk" onclick="absen('hadir')" aria-label="Mulai Mengajar">
+                            <i class="fas fa-play-circle"></i> Mulai Mengajar
                         </button>
-                        <button class="btn btn-exit" onclick="absen('keluar')" aria-label="Absen Keluar">
-                            <i class="fas fa-sign-out-alt"></i> Keluar
+                        <button class="btn btn-exit" onclick="absen('keluar')" aria-label="Selesai Mengajar">
+                            <i class="fas fa-stop-circle"></i> Selesai Mengajar
                         </button>
-                        <button class="btn btn-keluar" onclick="absen('izin')" aria-label="Absen Izin atau Sakit">
-                            <i class="fas fa-sign-out-alt"></i> Izin/Sakit
+                        <button class="btn btn-keluar" onclick="absen('izin')" aria-label="Izin">
+                            <i class="fas fa-sign-out-alt"></i> Izin
+                        </button>
+                        <button class="btn btn-sakit" onclick="absen('sakit')" aria-label="Sakit">
+                            <i class="fas fa-sign-out-alt"></i> Sakit
                         </button>
                         <button class="btn btn-reset" onclick="logoutGuru()" aria-label="Logout Guru">
                             <i class="fas fa-sign-out-alt"></i> Logout
@@ -595,7 +606,7 @@
                 </div>
             </div>
             <div class="card">
-                <h2 class="card-title"><i class="fas fa-user-shield"></i> Login Admin</h2>
+                <h2 class="card-title"><i class="fas fa-user-shield"></i> Dashboard Admin</h2>
                 <div id="adminLoginSection">
                     <div class="form-group">
                         <label for="adminEmail"><i class="fas fa-envelope"></i> Email Admin:</label>
@@ -635,7 +646,7 @@
             </div>
         </div>
         <div class="footer">
-            <p id="footer-text"></p>
+            <p id="footer-text">©2025 SMA Negeri 1 Limboto - Sistem Presensi Guru</p>
         </div>
     </div>
     <button class="floating-btn" id="helpBtn" title="Bantuan" aria-label="Bantuan Sistem">
@@ -648,6 +659,7 @@
             'https://rqyfgxvfkzuqngvjhkrm.supabase.co',
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxeWZneHZma3p1cW5ndmpoa3JtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU0MTU3NjQsImV4cCI6MjA3MDk5MTc2NH0.Beq3Z4EL7TMx59BYK6XERmCel_MQnIA7Jx__3_AwLVU'
         );
+
         // DOM Elements
         const mapelSelect = document.getElementById('mapel');
         const kelasSelect = document.getElementById('kelas');
@@ -673,15 +685,14 @@
         const helpBtn = document.getElementById('helpBtn');
         const reportData = document.getElementById('reportData');
         const footerText = document.getElementById('footer-text');
+
         // Inisialisasi aplikasi
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Aplikasi dimulai');
-            footerText.textContent = `\u00A9 ${new Date().getFullYear()} SMA Negeri 1 Limboto - Sistem Presensi Guru`;
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('filterDate').value = today;
-            await loadMataPelajaran();
             await loadKelas();
-            await loadStats(); // Statistik dimuat tanpa notifikasi error
+            await loadStats();
             loginGuruBtn.addEventListener('click', loginGuru);
             loginAdminBtn.addEventListener('click', handleAdminLogin);
             logoutAdminBtn.addEventListener('click', handleAdminLogout);
@@ -691,11 +702,12 @@
             helpBtn.addEventListener('click', showHelp);
             await checkUserSession();
         });
+
         // Cek sesi pengguna
         async function checkUserSession() {
-            const { data: { user } } = await supabaseClient.auth.getUser();
+            const {  { session, user } } = await supabaseClient.auth.getSession();
             if (user) {
-                const { data: guruData, error } = await supabaseClient
+                const {  guruData, error } = await supabaseClient
                     .from('guru')
                     .select('id_guru, nama')
                     .eq('auth_user_id', user.id)
@@ -710,6 +722,7 @@
                 }
             }
         }
+
         // Cek koneksi internet
         function checkOnlineStatus() {
             if (!navigator.onLine) {
@@ -718,33 +731,55 @@
             }
             return true;
         }
+
         // Show help
         function showHelp() {
-            alert(`Sistem Absensi Guru SMA Negeri 1 Limboto
-1. Login dengan akun guru
-2. Pilih mata pelajaran dan kelas
-3. Klik Masuk untuk memulai mengajar, Keluar untuk selesai, atau Izin/Sakit jika tidak hadir
-4. Admin bisa lihat laporan`);
+            alert(`Sistem Manajemen Kinerja Guru SMA Negeri 1 Limboto\n\n1. Login dengan akun guru\n2. Pilih mata pelajaran dan kelas\n3. Klik "Mulai Mengajar" untuk memulai, "Selesai Mengajar" untuk selesai, atau "Izin/Sakit" jika tidak hadir\n4. Admin bisa lihat laporan`);
         }
-        // Load mata pelajaran
+
+        // Load mata pelajaran (dari guru_mapel)
         async function loadMataPelajaran() {
+            if (!window.currentGuru) return;
+
             try {
                 const { data, error } = await supabaseClient
-                    .from('mata_pelajaran')
-                    .select('id_mapel, nama_mapel')
-                    .order('nama_mapel', { ascending: true });
-                if (error) throw error;
+                    .from('guru_mapel')
+                    .select(`
+                        mata_pelajaran (
+                            id_mapel,
+                            nama_mapel
+                        )
+                    `)
+                    .eq('guru_id', window.currentGuru.id_guru);
+
+                if (error) {
+                    console.error('Error fetching guru_mapel:', error);
+                    showNotification('Gagal muat mapel: ' + error.message, 'error');
+                    return;
+                }
+
                 mapelSelect.innerHTML = '<option value="">-- Pilih Mata Pelajaran --</option>';
-                data.forEach(mp => {
-                    const opt = document.createElement('option');
-                    opt.value = mp.id_mapel;
-                    opt.textContent = mp.nama_mapel;
-                    mapelSelect.appendChild(opt);
+
+                if (!data || data.length === 0) {
+                    showNotification(`Halo ${window.currentGuru.nama}, Anda belum ditugaskan mengajar mata pelajaran apapun. Silakan hubungi admin.`, 'warning');
+                    return;
+                }
+
+                data.forEach(item => {
+                    const mp = item.mata_pelajaran;
+                    if (mp) {
+                        const opt = document.createElement('option');
+                        opt.value = mp.id_mapel;
+                        opt.textContent = mp.nama_mapel;
+                        mapelSelect.appendChild(opt);
+                    }
                 });
             } catch (err) {
-                showNotification('Gagal memuat mata pelajaran: ' + err.message, 'error');
+                console.error('Error di loadMataPelajaran:', err);
+                showNotification('Gagal muat mata pelajaran: ' + err.message, 'error');
             }
         }
+
         // Load kelas
         async function loadKelas() {
             try {
@@ -761,24 +796,25 @@
                     kelasSelect.appendChild(opt);
                 });
             } catch (err) {
-                showNotification('Gagal memuat kelas: ' + err.message, 'error');
+                showNotification('Gagal muat kelas: ' + err.message, 'error');
             }
         }
-        // Load statistik (tanpa notifikasi error saat inisialisasi)
+
+        // Load statistik
         async function loadStats() {
             try {
                 const today = new Date().toISOString().split('T')[0];
-                const { data: guruCount } = await supabaseClient
+                const {  guruCount } = await supabaseClient
                     .from('guru')
                     .select('id_guru', { count: 'exact' });
-                const { data: absensiToday } = await supabaseClient
+                const {  absensiToday } = await supabaseClient
                     .from('absensi_guru')
                     .select('id_absensi', { count: 'exact' })
                     .eq('tanggal', today);
-                const { data: mapelCount } = await supabaseClient
+                const {  mapelCount } = await supabaseClient
                     .from('mata_pelajaran')
                     .select('id_mapel', { count: 'exact' });
-                const { data: kehadiranData } = await supabaseClient
+                const {  kehadiranData } = await supabaseClient
                     .from('absensi_guru')
                     .select('status')
                     .eq('tanggal', today);
@@ -795,6 +831,7 @@
                 console.warn(`Statistik gagal dimuat saat inisialisasi: ${err.message}`);
             }
         }
+
         // Login Guru
         async function loginGuru() {
             if (!checkOnlineStatus()) return;
@@ -811,7 +848,7 @@
                 });
                 if (error) throw error;
                 const user = data.user;
-                const { data: guruData, error: guruError } = await supabaseClient
+                const {  guruData, error: guruError } = await supabaseClient
                     .from('guru')
                     .select('id_guru, nama')
                     .eq('auth_user_id', user.id)
@@ -824,96 +861,138 @@
                 showMessage('Login gagal: ' + err.message, 'error');
             }
         }
+
         // Tampilkan halaman absensi
         function showAbsensiPage(user) {
             userName.textContent = window.currentGuru.nama;
             userEmail.textContent = user.email;
             userAvatar.textContent = window.currentGuru.nama.charAt(0).toUpperCase();
+            loadMataPelajaran();
             loginSection.classList.add('hidden');
             absensiSection.classList.remove('hidden');
         }
+
         // Logout Guru
         async function logoutGuru() {
             try {
                 const { error } = await supabaseClient.auth.signOut();
                 if (error) throw error;
-                window.currentGuru = null;
                 loginSection.classList.remove('hidden');
                 absensiSection.classList.add('hidden');
                 guruEmail.value = '';
                 guruPassword.value = '';
+                mapelSelect.value = '';
+                kelasSelect.value = '';
+                resultDiv.classList.remove('show');
+                window.currentGuru = null;
                 showNotification('Logout berhasil', 'success');
             } catch (err) {
                 showNotification('Gagal logout: ' + err.message, 'error');
             }
         }
+
         // Reset form
         function resetGuru() {
             mapelSelect.value = '';
             kelasSelect.value = '';
             resultDiv.classList.remove('show');
         }
-        // Absen
+
+        // Absen - Menggunakan invoke (modern)
         async function absen(status) {
             if (!checkOnlineStatus()) return;
-            const mapel = mapelSelect.value;
-            const kelas = kelasSelect.value;
-            if (!mapel || !kelas) {
-                showMessage('Lengkapi semua field!', 'error');
+
+            // Validasi waktu sekolah (07.00 - 15.45 WITA)
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+            const currentTimeInMinutes = currentHour * 60 + currentMinute;
+            const schoolStart = 7 * 60; // 07.00
+            const schoolEnd = 15 * 60 + 45; // 15.45
+
+            if (currentTimeInMinutes < schoolStart || currentTimeInMinutes > schoolEnd) {
+                showMessage('Absensi hanya bisa dilakukan selama jam sekolah (07.00 - 15.45 WITA)', 'error');
                 return;
             }
-            try {
-                const { data: mapelData } = await supabaseClient
-                    .from('mata_pelajaran')
-                    .select('id_mapel')
-                    .eq('id_mapel', mapel)
-                    .single();
-                const { data: kelasData } = await supabaseClient
-                    .from('kelas')
-                    .select('id_kelas')
-                    .eq('id_kelas', kelas)
-                    .single();
-                const { data: userData } = await supabaseClient.auth.getUser();
-                if (!mapelData || !kelasData || !userData.user) {
-                    showMessage('Data tidak valid', 'error');
+
+            // Untuk Izin/Sakit, tidak perlu pilih mapel/kelas
+            if (status === 'izin' || status === 'sakit') {
+                if (!confirm(`Anda yakin ingin mengisi status ${status}? Anda tidak akan mengajar hari ini.`)) {
                     return;
                 }
-                const response = await fetch('https://rqyfgxvfkzuqngvjhkrm.supabase.co/functions/v1/process-attendance', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${supabaseClient.auth.session()?.access_token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+            } else {
+                // Untuk hadir/keluar, wajib pilih mapel & kelas
+                const mapel = mapelSelect.value;
+                const kelas = kelasSelect.value;
+                if (!mapel || !kelas) {
+                    showMessage('Lengkapi semua field!', 'error');
+                    return;
+                }
+            }
+
+            try {
+                let mapelData = null;
+                let kelasData = null;
+
+                if (status !== 'izin' && status !== 'sakit') {
+                    const {  mpData, error: mpError } = await supabaseClient
+                        .from('mata_pelajaran')
+                        .select('id_mapel')
+                        .eq('id_mapel', mapel)
+                        .single();
+                    if (mpError) throw mpError;
+                    mapelData = mpData;
+
+                    const {  klsData, error: klsError } = await supabaseClient
+                        .from('kelas')
+                        .select('id_kelas')
+                        .eq('id_kelas', kelas)
+                        .single();
+                    if (klsError) throw klsError;
+                    kelasData = klsData;
+                }
+
+                // ✅ Gunakan invoke (modern, aman, tidak perlu akses token manual)
+                const {  data: invokeData, error: invokeError } = await supabaseClient.functions.invoke('process-attendance', {
+                    body: {
                         guru_id: window.currentGuru.id_guru,
-                        mata_pelajaran_id: mapelData.id_mapel,
-                        kelas_id: kelasData.id_kelas,
+                        mata_pelajaran_id: mapelData?.id_mapel || null,
+                        kelas_id: kelasData?.id_kelas || null,
                         status,
                         lokasi_absen: 'SMA Negeri 1 Limboto'
-                    })
+                    }
                 });
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Gagal memproses absensi');
+
+                if (invokeError) throw invokeError;
+
+                // Tampilkan notifikasi sukses
+                if (status === 'izin' || status === 'sakit') {
+                    showNotification(`${status.charAt(0).toUpperCase() + status.slice(1)} Anda diterima`, 'success');
+                } else {
+                    showNotification(`Absensi ${status} berhasil`, 'success');
                 }
+
                 showMessage(`Absensi berhasil: ${status}`, 'success');
-                showNotification(`Absensi ${status} berhasil`, 'success');
                 resetGuru();
             } catch (err) {
+                console.error('Error di absen():', err);
                 showMessage('Gagal absen: ' + err.message, 'error');
             }
         }
+
         // Show message
         function showMessage(msg, type) {
             resultDiv.textContent = msg;
             resultDiv.className = `result ${type} show`;
         }
+
         // Show notification
         function showNotification(msg, type) {
             notification.innerHTML = `${msg} <button onclick="this.parentElement.classList.remove('show')" style="background:none;border:none;color:white;cursor:pointer;">✕</button>`;
             notification.className = `notification ${type} show`;
             setTimeout(() => notification.classList.remove('show'), 5000);
         }
+
         // Admin Login
         async function handleAdminLogin() {
             if (!checkOnlineStatus()) return;
@@ -929,7 +1008,7 @@
                     password: password
                 });
                 if (error) throw error;
-                const { data: adminData, error: adminError } = await supabaseClient
+                const {  adminData, error: adminError } = await supabaseClient
                     .from('admin')
                     .select('id')
                     .eq('auth_user_id', data.user.id)
@@ -943,6 +1022,7 @@
                 showNotification('Login gagal: ' + err.message, 'error');
             }
         }
+
         // Admin Logout
         async function handleAdminLogout() {
             try {
@@ -957,6 +1037,7 @@
                 showNotification('Gagal logout: ' + err.message, 'error');
             }
         }
+
         // Refresh data admin
         async function refreshAdminData() {
             try {
@@ -993,6 +1074,7 @@
                 showNotification('Gagal muat data: ' + err.message, 'error');
             }
         }
+
         // Filter data
         async function filterReportData() {
             const date = document.getElementById('filterDate').value;
@@ -1036,6 +1118,7 @@
                 showNotification('Gagal memuat data: ' + err.message, 'error');
             }
         }
+
         // Export data ke Excel
         async function exportReportData() {
             try {
