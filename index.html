@@ -854,70 +854,68 @@
             resultDiv.classList.remove('show');
         }
         // Fungsi absen() di frontend
-        async function absen(status) {
-          try {
-            // 1. Validasi dasar
-            if (!window.currentGuru?.id_guru) {
-              throw new Error('Sesi guru tidak valid');
-            }
-        
-            // 2. Persiapan data berbeda per status
-            const payload = {
-              guru_id: window.currentGuru.id_guru,
-              status: status,
-              lokasi_absen: 'SMA Negeri 1 Limboto'
-            };
-        
-            // Hanya kirim mapel/kelas untuk absen masuk
-            if (status === 'hadir') {
-              const mapel = document.getElementById('mapelSelect').value;
-              const kelas = document.getElementById('kelasSelect').value;
-              
-              if (!mapel || !kelas) {
-                throw new Error('Pilih mata pelajaran dan kelas untuk absen masuk');
-              }
-              
-              payload.mata_pelajaran_id = mapel;
-              payload.kelas_id = kelas;
-            }
-        
-            // 3. Dapatkan session token
-            const { data: { session } } = await supabaseClient.auth.getSession();
-            if (!session?.access_token) {
-              throw new Error('Token akses tidak valid');
-            }
-        
-            // 4. Kirim request dengan error handling lengkap
-            const response = await fetch('https://rqyfgxvfkzuqngvjhkrm.supabase.co/functions/v1/process-attendance', {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${session.access_token}`,
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(payload)
-            });
-        
-            // 5. Handle response dengan cermat
-            const result = await response.json();
-            
-            if (!response.ok) {
-              throw new Error(result.error || 'Gagal memproses absensi');
-            }
-        
-            // 6. Update UI berdasarkan status
-            showMessage(result.message, 'success');
-            
-            if (status !== 'hadir') {
-              resetGuruForm();
-            }
-            
-            updateAttendanceStats();
-        
-          } catch (error) {
-            console.error('Absen Error:', error);
-            showMessage(`Gagal absen: ${error.message}`, 'error');
-          }
+        // Absen
+async function absen(status) {
+    if (!checkOnlineStatus()) return;
+
+    try {
+        const mapel = mapelSelect.value;
+        const kelas = kelasSelect.value;
+
+        // Validasi khusus untuk hadir/keluar
+        if ((status === "hadir" || status === "keluar") && (!mapel || !kelas)) {
+            showMessage('Untuk status hadir/keluar, pilih mata pelajaran dan kelas!', 'error');
+            return;
         }
+
+        // Validasi sesi guru
+        if (!window.currentGuru?.id_guru) {
+            showMessage('Sesi guru tidak valid. Silakan login ulang.', 'error');
+            return;
+        }
+
+        // Dapatkan token akses
+        const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+        if (sessionError) throw sessionError;
+        const accessToken = sessionData.session?.access_token;
+        if (!accessToken) throw new Error('Token akses tidak ditemukan');
+
+        // Data yang akan dikirim
+        const requestData = {
+            guru_id: window.currentGuru.id_guru,
+            status: status,
+            lokasi_absen: 'SMA Negeri 1 Limboto'
+        };
+
+        // Tambahkan mapel dan kelas hanya untuk hadir/keluar
+        if (status === "hadir" || status === "keluar") {
+            requestData.mata_pelajaran_id = mapel;
+            requestData.kelas_id = kelas;
+        }
+
+        // Kirim ke Supabase Function
+        const response = await fetch('https://rqyfgxvfkzuqngvjhkrm.supabase.co/functions/v1/process-attendance', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Gagal memproses absensi');
+        }
+
+        showMessage(`Absensi berhasil: ${status.toUpperCase()}`, 'success');
+        resetGuru();
+        await loadStats();
+    } catch (err) {
+        showMessage('Gagal absen: ' + err.message, 'error');
+        console.error('Error:', err);
+    }
+}
 
 // Fungsi pendukung
 function resetGuruForm() {
@@ -1107,6 +1105,7 @@ function showMessage(message, type) {
     </script>
 </body>
 </html>
+
 
 
 
