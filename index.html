@@ -856,53 +856,83 @@
         // Absen
         async function absen(status) {
             if (!checkOnlineStatus()) return;
+
             const mapel = mapelSelect.value;
             const kelas = kelasSelect.value;
+
             if (!mapel || !kelas) {
-                showMessage('Lengkapi semua field!', 'error');
+                showMessage('Pilih Mata Pelajaran dan Kelas terlebih dahulu.', 'error');
                 return;
             }
+
+            // Pastikan window.currentGuru sudah terisi dari proses login
+            if (!window.currentGuru || !window.currentGuru.id_guru) {
+                showMessage('Sesi guru tidak valid. Silakan login ulang.', 'error');
+                console.error('currentGuru object is missing or invalid.');
+                return;
+            }
+
             try {
-                const { data: mapelData } = await supabaseClient
+                // 1. Mendapatkan token akses dari sesi Supabase yang aktif
+                const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+                if (sessionError) {
+                    throw new Error('Gagal mendapatkan sesi otentikasi: ' + sessionError.message);
+                }
+                const accessToken = sessionData.session?.access_token;
+
+                if (!accessToken) {
+                    throw new Error('Token akses tidak ditemukan. Silakan login ulang.');
+                }
+
+                // 2. Memastikan mapel dan kelas valid di database (opsional, tapi bagus untuk validasi)
+                const { data: mapelData, error: mapelError } = await supabaseClient
                     .from('mata_pelajaran')
                     .select('id_mapel')
                     .eq('id_mapel', mapel)
                     .single();
-                const { data: kelasData } = await supabaseClient
+                if (mapelError) throw new Error('Mata pelajaran tidak valid: ' + mapelError.message);
+                if (!mapelData) throw new Error('Mata pelajaran tidak ditemukan.');
+
+                const { data: kelasData, error: kelasError } = await supabaseClient
                     .from('kelas')
                     .select('id_kelas')
                     .eq('id_kelas', kelas)
                     .single();
-                const { data: userData } = await supabaseClient.auth.getUser();
-                if (!mapelData || !kelasData || !userData.user) {
-                    showMessage('Data tidak valid', 'error');
-                    return;
-                }
+                if (kelasError) throw new Error('Kelas tidak valid: ' + kelasError.message);
+                if (!kelasData) throw new Error('Kelas tidak ditemukan.');
+
+                // 3. Panggil Edge Function untuk memproses absensi
                 const response = await fetch('https://rqyfgxvfkzuqngvjhkrm.supabase.co/functions/v1/process-attendance', {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${supabaseClient.auth.session()?.access_token}`,
+                        'Authorization': `Bearer ${accessToken}`, // Menggunakan token akses yang benar
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         guru_id: window.currentGuru.id_guru,
                         mata_pelajaran_id: mapelData.id_mapel,
                         kelas_id: kelasData.id_kelas,
-                        status,
-                        lokasi_absen: 'SMA Negeri 1 Limboto'
+                        status: status, // Menggunakan parameter status dari fungsi
+                        lokasi_absen: 'SMA Negeri 1 Limboto' // Lokasi tetap
                     })
                 });
+
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.error || 'Gagal memproses absensi');
+                    throw new Error(errorData.error || `Gagal memproses absensi: ${response.statusText}`);
                 }
-                showMessage(`Absensi berhasil: ${status}`, 'success');
-                showNotification(`Absensi ${status} berhasil`, 'success');
-                resetGuru();
+
+                // Jika berhasil
+                showMessage(`Absensi berhasil: ${status.toUpperCase()}`, 'success');
+                showNotification(`Absensi ${status.toUpperCase()} berhasil dicatat.`, 'success');
+                resetGuru(); // Reset form setelah absen
+                await loadStats(); // Perbarui statistik setelah absensi
             } catch (err) {
                 showMessage('Gagal absen: ' + err.message, 'error');
+                console.error('Absen Error:', err);
             }
         }
+
         // Show message
         function showMessage(msg, type) {
             resultDiv.textContent = msg;
@@ -1078,4 +1108,5 @@
     </script>
 </body>
 </html>
+
 
