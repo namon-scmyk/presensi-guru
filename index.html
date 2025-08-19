@@ -101,27 +101,40 @@
         }
         .stats-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 10px;
+            /* Default for smaller screens */
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
+            gap: 8px; /* Reduced gap */
             margin: 15px 0 20px;
         }
+        /* Adjust for larger screens to fit more in a row */
+        @media (min-width: 600px) {
+            .stats-container {
+                grid-template-columns: repeat(3, 1fr); /* 3 columns on medium screens */
+            }
+        }
+        @media (min-width: 900px) {
+            .stats-container {
+                grid-template-columns: repeat(6, 1fr); /* 6 columns on large screens */
+            }
+        }
+
         .stat-card {
             background: rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: var(--border-radius);
-            padding: 15px;
+            padding: 10px; /* Reduced padding */
             text-align: center;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             color: white;
         }
         .stat-number {
-            font-size: clamp(1.4rem, 4vw, 1.8rem);
+            font-size: clamp(1.2rem, 3.5vw, 1.6rem); /* Adjusted font size */
             font-weight: 700;
-            margin: 6px 0;
+            margin: 4px 0; /* Reduced margin */
         }
         .stat-label {
-            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            font-size: clamp(0.7rem, 2vw, 0.85rem); /* Adjusted font size */
             opacity: 0.9;
         }
         .main-content {
@@ -331,7 +344,7 @@
         }
         .report-item:hover {
             transform: translateX(5px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
         }
         .report-header {
             display: flex;
@@ -502,8 +515,19 @@
             .form-control {
                 padding: 10px;
             }
+            /* Stats container on very small screens */
             .stats-container {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Allow more flexibility */
+                gap: 5px; /* Even smaller gap */
+            }
+            .stat-card {
+                padding: 8px; /* Even smaller padding */
+            }
+            .stat-number {
+                font-size: clamp(1rem, 3vw, 1.4rem);
+            }
+            .stat-label {
+                font-size: clamp(0.65rem, 1.8vw, 0.8rem);
             }
             .notification {
                 font-size: 0.85rem;
@@ -527,8 +551,16 @@
                     <div class="stat-label">Guru Aktif</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number absensi-hari-ini">0</div>
-                    <div class="stat-label">Absensi Hari Ini</div>
+                    <div class="stat-number absen-masuk">0</div>
+                    <div class="stat-label">Absen Masuk</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number absen-keluar">0</div>
+                    <div class="stat-label">Absen Keluar</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number izin-sakit">0</div>
+                    <div class="stat-label">Izin/Sakit</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number kehadiran">0%</div>
@@ -673,15 +705,23 @@
         const helpBtn = document.getElementById('helpBtn');
         const reportData = document.getElementById('reportData');
         const footerText = document.getElementById('footer-text');
+
+        // Global variables for "Tidak Berlaku" IDs
+        let notApplicableMapelId = null;
+        let notApplicableKelasId = null;
+
         // Inisialisasi aplikasi
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Aplikasi dimulai');
             footerText.textContent = `\u00A9 ${new Date().getFullYear()} SMA Negeri 1 Limboto - Sistem Presensi Guru`;
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('filterDate').value = today;
+            
             await loadMataPelajaran();
             await loadKelas();
-            await loadStats(); // Statistik dimuat tanpa notifikasi error
+            await getNotApplicableIds(); // Get "Tidak Berlaku" IDs after loading options
+            await loadStats(); 
+            
             loginGuruBtn.addEventListener('click', loginGuru);
             loginAdminBtn.addEventListener('click', handleAdminLogin);
             logoutAdminBtn.addEventListener('click', handleAdminLogout);
@@ -689,8 +729,40 @@
             filterBtn.addEventListener('click', filterReportData);
             exportExcelBtn.addEventListener('click', exportReportData);
             helpBtn.addEventListener('click', showHelp);
+            
             await checkUserSession();
         });
+
+        // Function to get "Tidak Berlaku" IDs
+        async function getNotApplicableIds() {
+            try {
+                const { data: mapelNa, error: mapelError } = await supabaseClient
+                    .from('mata_pelajaran')
+                    .select('id_mapel')
+                    .eq('nama_mapel', 'Tidak Berlaku')
+                    .single();
+                // PGRST116 means no rows found, which is fine if 'Tidak Berlaku' isn't there yet
+                if (mapelError && mapelError.code !== 'PGRST116') throw mapelError; 
+                if (mapelNa) notApplicableMapelId = mapelNa.id_mapel;
+
+                const { data: kelasNa, error: kelasError } = await supabaseClient
+                    .from('kelas')
+                    .select('id_kelas')
+                    .eq('nama_kelas', 'Tidak Berlaku')
+                    .single();
+                if (kelasError && kelasError.code !== 'PGRST116') throw kelasError;
+                if (kelasNa) notApplicableKelasId = kelasNa.id_kelas;
+
+                if (!notApplicableMapelId || !notApplicableKelasId) {
+                    console.warn("Warning: 'Tidak Berlaku' IDs for Mata Pelajaran or Kelas not found. Please ensure they are inserted in your database.");
+                    // showNotification("Peringatan: ID 'Tidak Berlaku' untuk Mata Pelajaran atau Kelas tidak ditemukan. Pastikan sudah ada di database Anda.", "warning");
+                }
+            } catch (err) {
+                console.error("Error fetching 'Tidak Berlaku' IDs:", err.message);
+                showNotification("Gagal memuat ID 'Tidak Berlaku': " + err.message, "error");
+            }
+        }
+
         // Cek sesi pengguna
         async function checkUserSession() {
             const { data: { user } } = await supabaseClient.auth.getUser();
@@ -722,9 +794,9 @@
         function showHelp() {
             alert(`Sistem Absensi Guru SMA Negeri 1 Limboto
 1. Login dengan akun guru
-2. Pilih mata pelajaran dan kelas
+2. Pilih mata pelajaran dan kelas (jika absen masuk/keluar)
 3. Klik Masuk untuk memulai mengajar, Keluar untuk selesai, atau Izin/Sakit jika tidak hadir
-4. Admin bisa lihat laporan`);
+4. Admin bisa lihat laporan dan ekspor data`);
         }
         // Load mata pelajaran
         async function loadMataPelajaran() {
@@ -771,24 +843,29 @@
                 const { data: guruCount } = await supabaseClient
                     .from('guru')
                     .select('id_guru', { count: 'exact' });
-                const { data: absensiToday } = await supabaseClient
-                    .from('absensi_guru')
-                    .select('id_absensi', { count: 'exact' })
-                    .eq('tanggal', today);
-                const { data: mapelCount } = await supabaseClient
-                    .from('mata_pelajaran')
-                    .select('id_mapel', { count: 'exact' });
-                const { data: kehadiranData } = await supabaseClient
+                
+                const { data: absensiRecords, error: absensiError } = await supabaseClient
                     .from('absensi_guru')
                     .select('status')
                     .eq('tanggal', today);
 
-                const totalAbsensi = kehadiranData?.length || 0;
-                const hadirCount = kehadiranData?.filter(item => item.status === 'hadir').length || 0;
-                const kehadiranPersen = totalAbsensi > 0 ? Math.round((hadirCount / totalAbsensi) * 100) : 0;
+                if (absensiError) throw absensiError;
+
+                const totalAbsensiHariIni = absensiRecords?.length || 0;
+                const hadirCount = absensiRecords?.filter(item => item.status === 'hadir').length || 0;
+                const keluarCount = absensiRecords?.filter(item => item.status === 'keluar').length || 0;
+                const izinSakitCount = absensiRecords?.filter(item => item.status === 'izin' || item.status === 'sakit').length || 0;
+                
+                const kehadiranPersen = totalAbsensiHariIni > 0 ? Math.round((hadirCount / totalAbsensiHariIni) * 100) : 0;
+
+                const { data: mapelCount } = await supabaseClient
+                    .from('mata_pelajaran')
+                    .select('id_mapel', { count: 'exact' });
 
                 document.querySelector('.guru-aktif').textContent = guruCount?.length || 0;
-                document.querySelector('.absensi-hari-ini').textContent = absensiToday?.length || 0;
+                document.querySelector('.absen-masuk').textContent = hadirCount;
+                document.querySelector('.absen-keluar').textContent = keluarCount;
+                document.querySelector('.izin-sakit').textContent = izinSakitCount;
                 document.querySelector('.kehadiran').textContent = `${kehadiranPersen}%`;
                 document.querySelector('.mapel-terdaftar').textContent = mapelCount?.length || 0;
             } catch (err) {
@@ -853,89 +930,88 @@
             kelasSelect.value = '';
             resultDiv.classList.remove('show');
         }
-        // Fungsi absen() di frontend
+        
         // Absen
-async function absen(status) {
-    if (!checkOnlineStatus()) return;
+        async function absen(status) {
+            if (!checkOnlineStatus()) return;
 
-    try {
-        const mapel = mapelSelect.value;
-        const kelas = kelasSelect.value;
+            try {
+                const mapel = mapelSelect.value;
+                const kelas = kelasSelect.value;
 
-        // Validasi khusus untuk hadir/keluar
-        if ((status === "hadir" || status === "keluar") && (!mapel || !kelas)) {
-            showMessage('Untuk status hadir/keluar, pilih mata pelajaran dan kelas!', 'error');
-            return;
+                // Validasi khusus untuk hadir/keluar
+                if ((status === "hadir" || status === "keluar") && (!mapel || !kelas)) {
+                    showMessage('Untuk status hadir/keluar, pilih mata pelajaran dan kelas!', 'error');
+                    return;
+                }
+
+                // Validasi sesi guru
+                if (!window.currentGuru?.id_guru) {
+                    showMessage('Sesi guru tidak valid. Silakan login ulang.', 'error');
+                    return;
+                }
+
+                // Dapatkan token akses
+                const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+                if (sessionError) throw sessionError;
+                const accessToken = sessionData.session?.access_token;
+                if (!accessToken) throw new Error('Token akses tidak ditemukan');
+
+                // Data yang akan dikirim
+                const requestData = {
+                    guru_id: window.currentGuru.id_guru,
+                    status: status,
+                    lokasi_absen: 'SMA Negeri 1 Limboto'
+                };
+
+                // Tambahkan mapel dan kelas berdasarkan status
+                if (status === "hadir" || status === "keluar") {
+                    requestData.mata_pelajaran_id = mapel;
+                    requestData.kelas_id = kelas;
+                } else if (status === "izin" || status === "sakit") {
+                    // Gunakan ID "Tidak Berlaku" untuk status izin/sakit
+                    if (notApplicableMapelId && notApplicableKelasId) {
+                        requestData.mata_pelajaran_id = notApplicableMapelId;
+                        requestData.kelas_id = notApplicableKelasId;
+                    } else {
+                        // Fallback if "Tidak Berlaku" IDs are not found, though this should be caught by getNotApplicableIds()
+                        console.warn("Cannot use 'Tidak Berlaku' IDs. Sending with potentially null mapel/kelas.");
+                        // You might want to explicitly set them to null or handle differently based on DB schema
+                        requestData.mata_pelajaran_id = null; 
+                        requestData.kelas_id = null;
+                    }
+                }
+
+                // Kirim ke Supabase Function
+                const response = await fetch('https://rqyfgxvfkzuqngvjhkrm.supabase.co/functions/v1/process-attendance', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Gagal memproses absensi');
+                }
+
+                showMessage(`Absensi berhasil: ${status.toUpperCase()}`, 'success');
+                resetGuru();
+                await loadStats(); // Refresh stats after successful attendance
+            } catch (err) {
+                showMessage('Gagal absen: ' + err.message, 'error');
+                console.error('Error:', err);
+            }
         }
 
-        // Validasi sesi guru
-        if (!window.currentGuru?.id_guru) {
-            showMessage('Sesi guru tidak valid. Silakan login ulang.', 'error');
-            return;
-        }
-
-        // Dapatkan token akses
-        const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
-        if (sessionError) throw sessionError;
-        const accessToken = sessionData.session?.access_token;
-        if (!accessToken) throw new Error('Token akses tidak ditemukan');
-
-        // Data yang akan dikirim
-        const requestData = {
-            guru_id: window.currentGuru.id_guru,
-            status: status,
-            lokasi_absen: 'SMA Negeri 1 Limboto'
-        };
-
-        // Tambahkan mapel dan kelas hanya untuk hadir/keluar
-        if (status === "hadir" || status === "keluar") {
-            requestData.mata_pelajaran_id = mapel;
-            requestData.kelas_id = kelas;
-        }
-
-        // Kirim ke Supabase Function
-        const response = await fetch('https://rqyfgxvfkzuqngvjhkrm.supabase.co/functions/v1/process-attendance', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestData)
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Gagal memproses absensi');
-        }
-
-        showMessage(`Absensi berhasil: ${status.toUpperCase()}`, 'success');
-        resetGuru();
-        await loadStats();
-    } catch (err) {
-        showMessage('Gagal absen: ' + err.message, 'error');
-        console.error('Error:', err);
-    }
-}
-
-// Fungsi pendukung
-function resetGuruForm() {
-  document.getElementById('mapelSelect').value = '';
-  document.getElementById('kelasSelect').value = '';
-}
-
-function showMessage(message, type) {
-  const msgElement = document.getElementById('statusMessage');
-  msgElement.textContent = message;
-  msgElement.className = `message ${type}`;
-}
-
-
-        // Show message
+        // Show message (for resultDiv)
         function showMessage(msg, type) {
             resultDiv.textContent = msg;
             resultDiv.className = `result ${type} show`;
         }
-        // Show notification
+        // Show notification (for floating notification)
         function showNotification(msg, type) {
             notification.innerHTML = `${msg} <button onclick="this.parentElement.classList.remove('show')" style="background:none;border:none;color:white;cursor:pointer;">✕</button>`;
             notification.className = `notification ${type} show`;
@@ -1010,8 +1086,8 @@ function showMessage(message, type) {
                             </div>
                             <div class="class-subject">
                                 <div class="guru-nip">NIP: ${item.guru.nip}</div>
-                                <div class="guru-nip">Kelas: ${item.kelas.nama_kelas}</div>
-                                <div class="guru-nip">Mapel: ${item.mata_pelajaran.nama_mapel}</div>
+                                <div class="guru-nip">Kelas: ${item.kelas ? item.kelas.nama_kelas : 'N/A'}</div>
+                                <div class="guru-nip">Mapel: ${item.mata_pelajaran ? item.mata_pelajaran.nama_mapel : 'N/A'}</div>
                             </div>
                             <div class="date"><i class="far fa-clock"></i> ${item.tanggal} | ${item.waktu_absen}</div>
                         </div>
@@ -1052,8 +1128,8 @@ function showMessage(message, type) {
                             </div>
                             <div class="class-subject">
                                 <div class="guru-nip">NIP: ${item.guru.nip}</div>
-                                <div class="guru-nip">Kelas: ${item.kelas.nama_kelas}</div>
-                                <div class="guru-nip">Mapel: ${item.mata_pelajaran.nama_mapel}</div>
+                                <div class="guru-nip">Kelas: ${item.kelas ? item.kelas.nama_kelas : 'N/A'}</div>
+                                <div class="guru-nip">Mapel: ${item.mata_pelajaran ? item.mata_pelajaran.nama_mapel : 'N/A'}</div>
                             </div>
                             <div class="date"><i class="far fa-clock"></i> ${item.tanggal} | ${item.waktu_absen}</div>
                         </div>
@@ -1087,8 +1163,8 @@ function showMessage(message, type) {
                 const exportData = data.map(item => ({
                     Nama: item.guru.nama,
                     NIP: item.guru.nip,
-                    Kelas: item.kelas.nama_kelas,
-                    'Mata Pelajaran': item.mata_pelajaran.nama_mapel,
+                    Kelas: item.kelas ? item.kelas.nama_kelas : 'N/A',
+                    'Mata Pelajaran': item.mata_pelajaran ? item.mata_pelajaran.nama_mapel : 'N/A',
                     Status: item.status,
                     Tanggal: item.tanggal,
                     'Waktu Absen': item.waktu_absen
@@ -1105,9 +1181,3 @@ function showMessage(message, type) {
     </script>
 </body>
 </html>
-
-
-
-
-
-
